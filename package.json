@@ -1,0 +1,16 @@
+{
+  "name": "startrek",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc src/test.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jquery": "^3.3.29",
+    "jquery": "^3.4.0",
+    "typescript": "^3.4.5"
+  }
+}
