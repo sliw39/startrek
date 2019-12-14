@@ -12,7 +12,8 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     compress: true,
-    port: 80
+    disableHostCheck: true,
+    port: 8080
   },
   resolve: {
     extensions: ['.ts', '.js'],
