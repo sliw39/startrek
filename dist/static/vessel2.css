@@ -1,0 +1,322 @@
+
+html {
+    background: white;
+    font-family: "Roddenberry";
+    text-align: right;
+}
+
+body {
+    height: 297mm;
+    width: 420mm;
+    background-color: white;
+    display: flex;
+    flex-flow: row nowrap;
+    padding: 1cm;
+}
+
+.pane {
+    flex: 1;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+h1 {
+    color: white;
+    margin: 0;
+}
+h2 {
+    color: white;
+    margin: 0;
+    position: absolute;
+    right: 25mm;
+    margin-top: -1.1mm;
+    padding: 0 2mm;
+    font-size: 8mm;
+    background-color: white;
+}
+
+.item {
+    display: flex;
+    flex-direction: row;
+
+    padding: 5mm;
+    text-align: right;
+    min-height: 10mm;
+    line-height: 50%;
+    box-sizing: border-box;
+    margin: 1mm;
+}
+
+.section {
+    position: relative;
+    margin: 2mm;
+}
+
+.senior-staff {
+    background: white;
+    position: absolute;
+    width: 70%;
+    padding: 0 5mm 5mm 0;
+    margin-left: -1mm;
+}
+
+.rank-dot {
+    height: 2mm;
+    width: 2mm;
+    border-radius: 50%;
+    border: 1px solid grey;
+    margin-left: 2px;
+}
+
+.tooling {
+    width: 30%;
+    height: 100%;
+    margin-left: 70%;
+    display: flex;
+    flex-flow: column nowrap;
+}
+.tool {
+    border-bottom: 1mm solid white;
+    margin-left: 0 4mm;
+    height: 1.5cm;
+    width: 100%;
+}
+
+.senior-staff .item > div {
+    min-width: 1cm;
+}
+
+.rank {
+    display: flex;
+}
+.name {
+    flex: 1;
+}
+
+.staff {
+    background-color: white;
+    height: 100%;
+    width: 90%;
+    margin-top: 7mm;
+    padding: 5mm 5mm 5mm 0;
+    margin-left: -1mm;
+    position: absolute;
+}
+
+.renown {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    background-color: white;
+    bottom: 0;
+    top: 0;
+    right: 15mm;
+    margin-top: 7mm;
+    padding: 5mm 5mm 5mm 0;
+    margin-left: -1mm;
+    position: absolute;
+}
+
+.map {
+    background-color: white;
+    bottom: 0;
+    top: 0;
+    left: 5mm;
+    right: 0mm;
+    margin-top: 7mm;
+    padding: 5mm 5mm 5mm 0;
+    margin-left: -1mm;
+    position: absolute;
+}
+
+.status {
+    display: flex;
+    flex-flow: row;
+    background-color: white;
+    bottom: 0;
+    top: 0;
+    left: 5mm;
+    right: 0mm;
+    margin-top: 7mm;
+    padding: 5mm  0;
+    margin-left: -1mm;
+    position: absolute;
+}
+
+.status > * {
+    margin: 0 5mm;
+}
+
+.staff-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.staff-row > .item {
+    flex: 1;
+}
+.icon {
+    height: 10mm;
+    width: 10mm;
+    margin: 1mm;
+}
+
+.alignment {
+                width: 52mm;
+                height: 14mm;
+                position: relative;
+                text-align: center;
+                margin-left: 2mm;
+                margin-right: 2mm;
+                box-sizing: content-box;
+            }
+
+            .ruler {
+                display: flex;
+                width: 52mm;
+                height: 4mm;
+                margin-top: 6mm;
+                background: rgb(201,75,75);
+                position: relative;
+                position: absolute;
+                background: linear-gradient(90deg, rgba(201,75,75,1) 0%, rgba(255,239,48,1) 48%, rgba(204,255,129,1) 100%);
+            }
+
+            .dot {
+                border: 1px solid white;
+                height: 100%;
+                flex: 1;
+            }
+            .dot.hidden {
+                border: 1px solid white;
+                height: 100%;
+                flex: 1;
+                background-color: white;
+            }
+
+            .badge {
+                height: 90%;
+                margin: 1mm 0;
+                width: 13mm;
+                border: 2px solid grey;
+                border-radius: 30% 5% 30% 5%;
+                position: absolute;
+                z-index: 1;
+                top: 0;
+                left: 19mm;
+                background-size: cover;
+                background-position: right;
+            }
+
+            .gauge {
+                height: 100%;
+                width: 2cm;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                border: 0px solid black;
+            }
+            h3 {
+                padding: 0;
+                margin: 1mm;
+            }
+            .gauge-bg {
+                border: 0px solid black;
+                background: linear-gradient(0deg, rgba(201,75,75,1) 0%, rgba(255,239,48,1) 48%, rgba(204,255,129,1) 100%);
+                width: 100%;
+                flex: 1;
+                text-align: left;
+                display: flex;
+                flex-direction:column;
+                font-size: 3mm;
+            }
+            .gauge-step {
+                flex: 1;
+                border-bottom: 1px solid white;
+                padding-left: 1mm;
+                display: flex;
+                align-items: flex-end;
+            }
+            .step-maj {
+                flex: 1;
+                border-bottom: 1px solid grey;
+            }
+
+.stock {
+    display: flex;
+    flex-flow: row wrap;
+    flex: 1;
+}
+
+.stock > div {
+    width: 25%;
+}
+
+.stock .item {
+    max-height: 1cm;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.corn-br {
+    border-bottom-right-radius: 5mm;
+}
+
+.corn-tr {
+    border-top-right-radius: 5mm;
+}
+
+.corn-tl {
+    border-top-left-radius: 5mm;
+}
+
+.corn-bl {
+    border-bottom-left-radius: 5mm;
+}
+
+.red {
+    background-color: rgb(255, 143, 143);
+}
+.orange {
+    background-color: rgb(253, 164, 81);
+}
+.purple {
+    background-color: rgb(196, 154, 216);
+}
+.green {
+    background-color: rgb(156, 228, 153);
+}
+.blue {
+    background-color: rgb(118, 203, 253);
+}
+.yellow {
+    background-color: rgb(245, 235, 103);
+}
+.white {
+    background-color: white;
+}
+.red-color {
+    color: rgb(255, 143, 143);
+}
+.orange-color {
+    color: rgb(253, 164, 81);
+}
+.purple-color {
+    color: rgb(196, 154, 216);
+}
+.green-color {
+    color: rgb(156, 228, 153);
+}
+.blue-color {
+    color: rgb(118, 203, 253);
+}
+.yellow-color {
+    color: rgb(245, 235, 103);
+}
+.black-color {
+    color: #4e4e4e;
+}
+

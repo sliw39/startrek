@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <title>Document</title>
+    <style>
+        body {
+            background: grey;
+
+        }
+
+        .a4 {
+            height: 297mm;
+            width: 210mm;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-flow: column nowrap;
+            padding: 1cm;
+            box-sizing: border-box;
+            background-image: url(bg-vessel.png);
+            background-size: contain;
+        }
+
+        .common {
+            display: flex;
+            flex-flow: row nowrap;
+            width: 100%;
+            margin-bottom: 1cm;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            width: 100%;
+            margin-top: 7px;
+            height: 20px;
+        }
+
+        .row>.label {
+            font-family: "Roddenberry";
+            text-align: right;
+            padding: 0 6px;
+            width: 135px;
+        }
+
+        .row>.value {
+            flex: 1;
+        }
+
+        .title {
+            color: white;
+            position: absolute;
+            font-family: "Roddenberry";
+            letter-spacing: 1px;
+            width: 145px;
+        }
+
+        .topleft {
+            grid-area: "tl";
+            border-top-left-radius: 100%;
+            border-color: #9739C0;
+        }
+
+        .topleft .title {
+            background-color: #9739C0;
+            bottom: 0;
+            right: 0;
+            padding: 5px 10px 0 0;
+            border-top-left-radius: 32px;
+            text-align: right;
+        }
+
+        .topright {
+            grid-area: "tr";
+            border-top-right-radius: 100%;
+            border-color: #D34B30;
+        }
+
+        .topright .title {
+            background-color: #D34B30;
+            bottom: 0;
+            left: 0;
+            padding: 5px 0 0 10px;
+            border-top-right-radius: 32px;
+            text-align: left;
+        }
+
+        .bottomleft {
+            grid-area: "bl";
+            border-bottom-left-radius: 100%;
+            border-color: #39C05E;
+        }
+
+        .bottomleft .title {
+            background-color: #39C05E;
+            top: 0;
+            right: 0;
+            padding: 0px 10px 5px 0px;
+            border-bottom-left-radius: 32px;
+            text-align: right;
+        }
+
+        .bottomright {
+            grid-area: "br";
+            border-bottom-right-radius: 100%;
+            border-color: #397FC0;
+        }
+
+        .bottomright .title {
+            background-color: #397FC0;
+            top: 0;
+            left: 0;
+            padding: 0 0 5px 10px;
+            border-bottom-right-radius: 32px;
+            text-align: left;
+        }
+
+        .cube {
+            position: absolute;
+            background-size: contain;
+            background-image: url("cube.svg");
+        }
+
+        .cube2 {
+            position: relative;
+            height: 20px;
+            width: 20px;
+            background-size: contain;
+            background-image: url("cube.svg");
+        }
+
+        .bonuses {
+            flex: 1;
+            align-self: flex-start;
+        }
+
+        .bonuses .label {
+            width: 82px;
+        }
+
+        .circle {
+            position: relative;
+            height: 13.06px;
+            width: 13.06px;
+            border: 1px solid black;
+            border-radius: 100%;
+            margin: 3px 1px 0 1px;
+        }
+
+        .checkbox {
+            height: 13.06px;
+            width: 13.06px;
+            border: 1px solid black;
+        }
+
+        .misc {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            margin-top: 1cm;
+        }
+
+        .stuff {
+            flex: 1;
+            margin-left: 5cm;
+        }
+
+        .stuff .row .label {
+            text-align: left;
+            width: 84px;
+        }
+
+        .stuff .value {
+            margin-left: 6px;
+        }
+
+        .misc .row {
+            margin-top: 10px;
+        }
+
+        .label.type::after {
+            content: "____";
+            font-family: arial;
+        }
+
+        .badge {
+            height: 55mm;
+            width: 30mm;
+            background-image: url(badge.png);
+            background-size: contain;
+            position: absolute;
+            right: 1cm;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="a4">
+
+        <div class="common">
+            <div class="picture"></div>
+            <div class="info">
+                <div class="row">
+                    <div class="label">NOM :</div>
+                    <div class="value">________________________</div>
+                </div>
+                <div class="row">
+                    <div class="label">ESPECE :</div>
+                    <div class="value">________________________</div>
+                </div>
+                <div class="row">
+                    <div class="label">VAISSEAU :</div>
+                    <div class="value">________________________</div>
+                </div>
+                <div class="row">
+                    <div class="label">SPECIALITE :</div>
+                    <div class="value">________________________</div>
+                </div>
+                <div class="row">
+                    <div class="label">SECOND ROLE :</div>
+                    <div class="value">________________________</div>
+                </div>
+            </div>
+            <div class="info">
+                <div class="row">
+                    <div class="label">MODULE IA :</div>
+                    <div class="value">________________________</div>
+                </div>
+                <div class="row">
+                    <div class="label">POPULATION :</div>
+                    <div class="value">________________________</div>
+                </div>
+                <div class="row"></div>
+                <div class="row">
+                    <div class="label">STOCK DE DILITHIUM :</div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                    <div class="cube2"></div>
+                </div>
+             </div>
+            
+        </div>
+
+        <div class="stock">
+            
+        </div>
+
+        <div class="misc">
+            
+        </div>
+
+    </div>
+</body>
+
+</html>

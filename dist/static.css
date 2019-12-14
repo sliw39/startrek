@@ -1,0 +1,118 @@
+@font-face {font-family:"Roddenberry";src:url("fonts/Roddenberry.eot?") format("eot"),url("fonts/Roddenberry.woff") format("woff"),url("fonts/Roddenberry.ttf") format("truetype"),url("fonts/Roddenberry.svg#Roddenberry") format("svg");font-weight:normal;font-style:normal;}
+
+
+body {
+    background-color: black;
+    color: white;
+    font-size: 17px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+body > * {
+    font-family: Roddenberry;
+}
+
+.error {
+    color: rgb(255, 143, 143);
+}
+
+input, button, select, textarea {
+    border-style: hidden;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+input, select {
+    border-radius: 18px;
+    height: 36px;
+    color: black;
+    text-align: center;
+}
+
+textarea {
+    color: black;
+}
+
+.row {
+    margin-bottom: 5px;
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.item {
+    display: flex;
+    flex-direction: row;
+    padding: 5mm;
+    text-align: right;
+    min-height: 10mm;
+    line-height: 50%;
+    box-sizing: border-box;
+    margin: 1mm;
+    min-width: 152px;
+}
+
+
+.corn-br {
+    border-bottom-right-radius: 100px;
+}
+
+.corn-tr {
+    border-top-right-radius: 100px;
+}
+
+.corn-tl {
+    border-top-left-radius: 100px;
+}
+
+.corn-bl {
+    border-bottom-left-radius: 100px;
+}
+
+.red {
+    background-color: rgb(255, 72, 72);
+}
+.orange {
+    background-color: rgb(253, 164, 81);
+}
+.purple {
+    background-color: rgb(196, 154, 216);
+}
+.green {
+    background-color: rgb(31, 177, 25);
+}
+.blue {
+    background-color: rgb(10, 141, 218);
+}
+.yellow {
+    background-color: rgb(245, 235, 103);
+}
+.white {
+    background-color: white;
+}
+.red-color {
+    color: rgb(255, 143, 143);
+}
+.orange-color {
+    color: rgb(253, 164, 81);
+}
+.purple-color {
+    color: rgb(196, 154, 216);
+}
+.green-color {
+    color: rgb(156, 228, 153);
+}
+.blue-color {
+    color: rgb(118, 203, 253);
+}
+.yellow-color {
+    color: rgb(245, 235, 103);
+}
+.black-color {
+    color: #e0e0e0;
+}

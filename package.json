@@ -2,7 +2,7 @@
   "name": "startrek",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "compile": "tsc src/test.ts"
   },
@@ -10,7 +10,29 @@
   "license": "ISC",
   "dependencies": {
     "@types/jquery": "^3.3.29",
+    "@types/marked": "^0.7.1",
+    "css-loader": "^3.2.0",
+    "declaration-bundler-webpack-plugin": "^1.0.3",
+    "firebase": "^7.4.0",
     "jquery": "^3.4.0",
-    "typescript": "^3.4.5"
+    "less": "^3.10.3",
+    "marked": "^0.7.0",
+    "style-loader": "^1.0.0",
+    "typescript": "^3.4.5",
+    "vue": "^2.6.10",
+    "vue-class-component": "^7.1.0",
+    "vue-loader": "^15.7.2",
+    "vue-property-decorator": "^8.3.0",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.6.10",
+    "vuefire": "^2.2.0",
+    "vuetype": "^0.3.2"
+  },
+  "devDependencies": {
+    "less-loader": "^5.0.0",
+    "ts-loader": "^6.2.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
   }
 }
