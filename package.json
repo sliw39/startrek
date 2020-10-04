@@ -4,7 +4,8 @@
   "description": "",
   "private": true,
   "scripts": {
-    "compile": "tsc src/test.ts"
+    "compile": "tsc src/test.ts",
+    "start:dev": "webpack-dev-server --host 0.0.0.0"
   },
   "author": "",
   "license": "ISC",
