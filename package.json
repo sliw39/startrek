@@ -4,21 +4,25 @@
   "description": "",
   "private": true,
   "scripts": {
-    "compile": "tsc src/test.ts"
+    "compile": "tsc src/test.ts",
+    "start:dev": "webpack serve"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/jquery": "^3.3.29",
+    "@types/lodash": "^4.14.167",
     "@types/marked": "^0.7.1",
     "css-loader": "^3.2.0",
     "declaration-bundler-webpack-plugin": "^1.0.3",
     "firebase": "^7.4.0",
-    "jquery": "^3.4.0",
+    "jquery": "^3.5.1",
     "less": "^3.10.3",
+    "lodash": "^4.17.20",
     "marked": "^0.7.0",
+    "node": "^15.4.0",
     "style-loader": "^1.0.0",
-    "typescript": "^3.4.5",
+    "typescript": "^4.0.0",
     "vue": "^2.6.10",
     "vue-class-component": "^7.1.0",
     "vue-loader": "^15.7.2",
@@ -32,7 +36,7 @@
     "less-loader": "^5.0.0",
     "ts-loader": "^6.2.1",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.9.0"
+    "webpack-cli": "^4.3.0",
+    "webpack-dev-server": "^3.11.0"
   }
 }

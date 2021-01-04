@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
         "rootDir": "src/",
-        "target": "es5",
+        "target": "es6",
         "strict": true,
-        "module": "es2015",
+        "module": "ES6",
         "moduleResolution": "node",
         "experimentalDecorators": true,
         "allowSyntheticDefaultImports": true,
