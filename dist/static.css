@@ -3,6 +3,7 @@
 
 body {
     background-color: black;
+    background-image: url(static/bgmap.png);
     color: white;
     font-size: 17px;
     position: absolute;
