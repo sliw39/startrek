@@ -26,7 +26,7 @@ import {Component, Vue, Prop} from "vue-property-decorator";
 import MsgCreateComponent from "../messages/msg-create-component.vue";
 import MsgListComponent from "../messages/msg-list-component.vue"
 import MsgComponent from "../messages/msg-component.vue"
-import LoginComponent from "./login-component.vue";
+import LoginComponent from "../main/login-component.vue";
 
 @Component({
   components: {
@@ -36,7 +36,7 @@ import LoginComponent from "./login-component.vue";
     LoginComponent
   }
 })
-export default class MainComponent extends Vue {
+export default class MainMsgComponent extends Vue {
   @Prop(String) readonly propMessage: String | undefined;
   msgId: String | null = null;
   login: String | null = null;

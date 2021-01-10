@@ -3,7 +3,6 @@
 
 body {
     background-color: black;
-    background-image: url(static/bgmap.png);
     color: white;
     font-size: 17px;
     position: absolute;
@@ -56,23 +55,24 @@ textarea {
     box-sizing: border-box;
     margin: 1mm;
     min-width: 152px;
+    color: black;
 }
 
 
 .corn-br {
-    border-bottom-right-radius: 100px;
+    border-bottom-right-radius: 2em;
 }
 
 .corn-tr {
-    border-top-right-radius: 100px;
+    border-top-right-radius: 2em;
 }
 
 .corn-tl {
-    border-top-left-radius: 100px;
+    border-top-left-radius: 2em;
 }
 
 .corn-bl {
-    border-bottom-left-radius: 100px;
+    border-bottom-left-radius: 2em;
 }
 
 .red {
@@ -95,6 +95,27 @@ textarea {
 }
 .white {
     background-color: white;
+}
+.red-border {
+    border-color: rgb(255, 72, 72);
+}
+.orange-border {
+    border-color: rgb(253, 164, 81);
+}
+.purple-border {
+    border-color: rgb(196, 154, 216);
+}
+.green-border {
+    border-color: rgb(31, 177, 25);
+}
+.blue-border {
+    border-color: rgb(10, 141, 218);
+}
+.yellow-border {
+    border-color: rgb(245, 235, 103);
+}
+.white-border {
+    border-color: white;
 }
 .red-color {
     color: rgb(255, 143, 143);

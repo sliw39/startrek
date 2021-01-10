@@ -1,7 +1,9 @@
+import { IPoint } from "../framework/geometry";
+
 export const G = 6.67430*Math.pow(10,-11)
 const PI = Math.PI
 
-export interface Coordinate {
+export interface Coordinate extends IPoint {
     x: number;
     y: number;
     unit: DistanceUnit;

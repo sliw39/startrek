@@ -4,7 +4,7 @@
     ref="star"
     @click="$emit('clicked')" 
     :class="{'selected': selected}"
-    :style="{left: x+'px', top: y+'px'}">*&nbsp;<span class="name">{{system.names[0]}}</span>&nbsp;<span class="subname" v-if="system.names[1]">({{system.names[1]}})</span></div>
+    :style="{left: x+'px', top: y+'px'}">&nbsp;<span class="name">{{system.names[0]}}</span>&nbsp;<span class="subname" v-if="system.names[1]">({{system.names[1]}})</span></div>
 </template>
 
 <script lang="ts">
@@ -26,6 +26,14 @@ export default class StarComponent extends Vue {
     position: absolute;
     cursor: pointer;
     color: white;
+    user-select: none;
+
+    &::before {
+        position: absolute;
+        content: "*";
+        left: -3px;
+        top: -6px;
+    }
 
     &.selected {
        color: yellow; 
