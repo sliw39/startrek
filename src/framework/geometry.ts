@@ -10,6 +10,10 @@ export class Point implements IPoint {
         }
     }
 
+    static origin() {
+        return new Point(0, 0);
+    }
+
     translated(vector: Vector) {
         return vector.apply(this);
     }

@@ -4,6 +4,12 @@
     </div>    
 </template>
 
+<style lang="less">
+    .btn {
+        cursor: pointer;
+    }
+</style>
+
 <script lang="ts">
 import { parseCorner } from "./style.utils";
 import {Component, Vue, Prop, Emit} from "vue-property-decorator";

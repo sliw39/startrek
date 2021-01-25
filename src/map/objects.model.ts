@@ -1,4 +1,4 @@
-import { IPoint } from "../framework/geometry";
+import { IPoint, Point } from "../framework/geometry";
 
 export const G = 6.67430*Math.pow(10,-11)
 const PI = Math.PI
@@ -10,6 +10,14 @@ export interface Coordinate extends IPoint {
     parent?: Coordinate;
     distanceToParent?: Distance;
 }
+export function coord(point: IPoint, unit: DistanceUnit = "al", parent?: Coordinate, distanceToParent?: Distance) {
+    return {
+        ...point,
+        unit,
+        parent,
+        distanceToParent
+    }
+} 
 
 export interface Instant {
     velocity: number;
@@ -25,7 +33,27 @@ export class Mass {
     private static JUP_RAD = 1.898;
     private static SUN_RAD = 1.989;
 
-    constructor(private value: number, unit: MassUnit = "kg") {
+    static zero(unit: MassUnit = "kg") {
+        return new Mass(0, unit);
+    }
+
+    static sun(factor = 1) {
+        return new Mass(1*factor, "sun")
+    }
+
+    static earth(factor = 1) {
+        return new Mass(1*factor, "earth")
+    }
+
+    static moon(factor = 1) {
+        return new Mass(1*factor, "moon")
+    }
+
+    static jupiter(factor = 1) {
+        return new Mass(1*factor, "jupiter")
+    }
+
+    constructor(private value: number, public unit: MassUnit = "kg") {
         switch(unit) {
             case "g":
                 this.stdValue = this.value;
@@ -61,7 +89,7 @@ export class Mass {
         }
     }
 
-    get(unit: MassUnit) {
+    get(unit: MassUnit = this.unit) {
         switch(unit) {
             case "g":
                 return this.stdValue * Math.pow(10, this.exp + 3);
@@ -105,6 +133,14 @@ export class Distance {
     private readonly exp: number;
     private static UA_RAD = 1.496;
     private static AL_RAD = 9.5;
+
+    static zero(unit: DistanceUnit = "al") {
+        return new Distance(0, unit);
+    }
+
+    static sunRadius(factor = 1) {
+        return new Distance(.7 * factor, "mkm");
+    }
 
     static fromCoordinates(c1: Coordinate, c2: Coordinate) {
         let ref = c2;
@@ -151,116 +187,210 @@ export class Distance {
         }
     }
 
-    add(mass: Distance|number, unit?: DistanceUnit) {
-        if(typeof mass === "number") {
-            mass = new Distance(mass, unit);
+    add(dist: Distance|number, unit?: DistanceUnit) {
+        if(typeof dist === "number") {
+            dist = new Distance(dist, unit);
         }
-        this.stdValue += mass.get("km");
+        this.stdValue += dist.get("km");
     }
 
     get km() { return this.get("mkm") * 1000; }
     get mkm() { return this.get("mkm"); }
     get ua() { return this.get("ua"); }
     get al() { return this.get("al"); }
+
+    print() {
+        return this.get() + this.unit;
+    }
 }
 
+export type TemperatureUnit = "K" | "C" | "F";
+export class Temperature {
+    private stdValue: number;
+    private static C_RAD = 273.15;
+    private static F_RAD = 459.67;
+
+    static k(value: number) { return new Temperature(value, "K"); }
+    static c(value: number) { return new Temperature(value, "C"); }
+    static f(value: number) { return new Temperature(value, "F"); }
+
+    static zero(unit: TemperatureUnit = "K") {
+        return new Temperature(0, unit);
+    }
+
+    static sun() {
+        return Temperature.k(5500);
+    }
+
+    constructor(private value: number, public unit: TemperatureUnit = "K") {
+        switch(unit) {
+            case "K":
+                this.stdValue = this.value;
+                break;
+            case "C":
+                this.stdValue = this.value - Temperature.C_RAD;
+                break;
+            case "F":
+                this.stdValue = this.value - Temperature.F_RAD;
+                break;
+        }
+    }
+
+    get(unit: TemperatureUnit = this.unit) {
+        switch(unit) {
+            case "K":
+                return this.stdValue;
+            case "C":
+                return this.stdValue + Temperature.C_RAD;
+            case "F":
+                return this.stdValue + Temperature.F_RAD;
+        }
+    }
+
+    get k() { return this.get("K"); }
+    get c() { return this.get("C"); }
+    get f() { return this.get("F"); }
+
+    print() {
+        return this.get() + this.unit;
+    }
+}
+
+export type TimeUnit = "ms" | "s" | "m" | "h" | "d" | "w" | "y";
+export class Time {
+    private stdValue: number;
+
+    static zero(unit: TimeUnit = "d") {
+        return new Time(0, unit);
+    }
+
+    constructor(private value: number, public unit: TimeUnit) {
+        switch(unit) {
+            case "ms":
+                this.stdValue = this.value / 1000;
+                break;
+            case "s":
+                this.stdValue = this.value;
+                break;
+            case "m":
+                this.stdValue = this.value * 60;
+                break;
+            case "h":
+                this.stdValue = this.value * 3600;
+                break;
+            case "d":
+                this.stdValue = this.value * 3600 * 24;
+                break;
+            case "w":
+                this.stdValue = this.value * 3600 * 24 * 7;
+                break;
+            case "y":
+                this.stdValue = this.value * 3600 * 24 * 7 * 365;
+                break;
+        }
+    }
+
+    get(unit: TimeUnit = this.unit) {
+        switch(unit) {
+            case "ms":
+                this.stdValue = this.value * 1000;
+                break;
+            case "s":
+                this.stdValue = this.value;
+                break;
+            case "m":
+                this.stdValue = this.value / 60;
+                break;
+            case "h":
+                this.stdValue = this.value / 3600;
+                break;
+            case "d":
+                this.stdValue = this.value / 24 / 3600;
+                break;
+            case "w":
+                this.stdValue = this.value / 7 / 24 / 3600;
+                break;
+            case "y":
+                this.stdValue = this.value / 365 / 7 / 24 / 3600;
+                break;
+        }
+    }
+
+    get ms() { return this.get("ms"); }
+    get s() { return this.get("s"); }
+    get m() { return this.get("m"); }
+    get h() { return this.get("h"); }
+    get d() { return this.get("d"); }
+    get w() { return this.get("w"); }
+    get y() { return this.get("y"); }
+
+    print() {
+        return this.get() + this.unit;
+    }
+}
+
+export class Appearance {
+    constructor(public brightness: number, public oclass?: string, public colors: string[] = []) {}
+}
+
+export class PhysicalProperties {
+    constructor(public radius = Distance.zero(), public mass = Mass.zero(), public temperature = Temperature.zero()) {}
+}
 
 export class OrbitalProperties {
-    public readonly period: number;
-    public readonly length: Distance;
-    public readonly excentricity: number;
-    public readonly periaster: Instant;
-    public readonly apoaster: Instant;
-    public readonly mu: number;
-    private readonly asquared: number;
-    private readonly bsquared: number;
-    private readonly a: number;
-    private readonly b: number;
+
+    static origin() {
+        return new OrbitalProperties(Distance.zero(), 0, Time.zero(), 0);
+    }
 
     constructor(
-        public majorAxis: Distance,
-        public minorAxis: Distance,
-        public mass: Mass,
-        public parent: System | CelestialObject,
-        public shift: number
-    ) {
-        const a = this.a = majorAxis.km/2;
-        const b = this.b = minorAxis.km/2;
-        this.asquared = a*a;
-        this.bsquared = b*b;
-        const acube = this.asquared*a;
-        const pisquared = PI * PI
-        this.mu = (G * (this.parent instanceof System ? this.parent : this.parent.orbital).mass.kg)
-        this.period = Math.sqrt((4 * pisquared * acube) / this.mu);
-        this.length = new Distance(PI * Math.sqrt(2*(this.asquared+this.bsquared)));
-        this.excentricity = Math.sqrt((this.asquared - this.bsquared) / this.asquared);
+        public semiMajorAxis: Distance,
+        public excentricity: number,
+        public period: Time,
+        public tilt: number
+    ) {}
 
-        let r = new Distance(a * (1 - this.excentricity));
-        this.periaster = {
-            velocity: (this.mu / a) * (1 + this.excentricity) / (1 - this.excentricity),
-            coordinates: {
-                x: r.get(majorAxis.unit) * Math.cos(this.shift * 2 * PI),
-                y: r.get(majorAxis.unit) * Math.sin(this.shift * 2 * PI),
-                distanceToParent: r,
-                unit: majorAxis.unit
-            }
-        }
-
-        r = new Distance(a * (1 + this.excentricity));
-        this.apoaster = {
-            velocity: (this.mu / a) * (1 - this.excentricity) / (1 + this.excentricity),
-            coordinates: {
-                x: r.get(majorAxis.unit) * Math.cos(this.shift * 2 * PI),
-                y: r.get(majorAxis.unit) * Math.sin(this.shift * 2 * PI),
-                distanceToParent: r,
-                unit: majorAxis.unit
-            }
-        }
-    }
-
-    instant(percent: number): Instant {
-        let rpx = percent * 2 * PI
-        let cos = (- Math.cos(rpx) + 1)/2
-        let max = cos * (this.periaster.velocity-this.apoaster.velocity)
-
-        let tantheta = Math.tan(rpx);
-        let x = (this.a * this.b) / Math.sqrt(this.bsquared + this.asquared * tantheta * tantheta) * (-PI/2 < rpx && PI/2 > rpx ? 1 : -1)
-        return {
-            velocity: max + this.apoaster.velocity,
-            coordinates: {
-                x: new Distance(x).get(this.majorAxis.unit), y: new Distance(x * tantheta).get(this.majorAxis.unit),
-                unit: this.majorAxis.unit
-            }
-        }
-    }
 }
 
 export class System {
     public readonly mass: Mass;
+    public readonly temperature: number;
+    public readonly brightness: number;
     constructor(public names: string[], public coordinate: Coordinate, public objects: CelestialObject[]) {
         this.mass = new Mass(0);
+        let temperatureSum = 0;
+        this.brightness = 0
         for(let o of objects) {
-            this.mass.add(o.orbital.mass);
+            this.mass.add(o.physical.mass);
+            temperatureSum += o.physical.temperature.k * o.appearance.brightness;
+            this.brightness += o.appearance.brightness;
         }
+        this.temperature = temperatureSum / this.brightness;
+    }
+
+    static defaultSystem() {
+        return new System(["New Sys"], coord(Point.origin()), [ new Star(["Main Star"]) ]); 
     }
 }
 
 export class CelestialObject {
-    constructor(public names: string[], public orbital: OrbitalProperties) {}
+    constructor(public names: string[], public orbital = OrbitalProperties.origin(), public physical: PhysicalProperties, public appearance: Appearance) {}
 }
 
 export class Star extends CelestialObject {
-    constructor(names: string[], orbital: OrbitalProperties) { super(names, orbital); }
+    constructor(names: string[], public physical = new PhysicalProperties(Distance.sunRadius(), Mass.sun(), Temperature.sun()), appearance = new Appearance(1), orbital = OrbitalProperties.origin()) { 
+        super(names, orbital, physical, appearance); 
+    }
 }
 
 export class Planet extends CelestialObject {
-    constructor(names: string[], orbital: OrbitalProperties) {  super(names, orbital); }
+    constructor(names: string[], orbital: OrbitalProperties|undefined, public physical: PhysicalProperties, appearance: Appearance) {  super(names, orbital, physical, appearance); }
 }
 
 export class Moon extends CelestialObject {
-    constructor(names: string[], orbital: OrbitalProperties) {  super(names, orbital); }
+    constructor(names: string[], orbital: OrbitalProperties|undefined, public physical: PhysicalProperties, appearance: Appearance) {  super(names, orbital, physical, appearance); }
 }
 
 export class Asteroid extends CelestialObject {
-    constructor(names: string[], orbital: OrbitalProperties) {  super(names, orbital); }
+    constructor(names: string[], orbital: OrbitalProperties|undefined, public physical: PhysicalProperties, appearance: Appearance) {  super(names, orbital, physical, appearance); }
 }
