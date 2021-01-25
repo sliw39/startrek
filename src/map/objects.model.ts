@@ -1,7 +1,9 @@
 import { IPoint, Point } from "../framework/geometry";
+import _, { identity } from "lodash";
 
 export const G = 6.67430*Math.pow(10,-11)
 const PI = Math.PI
+
 
 export interface Coordinate extends IPoint {
     x: number;
@@ -32,6 +34,18 @@ export class Mass {
     private static EARTH_RAD = 5.972;
     private static JUP_RAD = 1.898;
     private static SUN_RAD = 1.989;
+  
+    static parse(data: string) {
+        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
+        if(groups) {
+            return new Mass(parseFloat(groups[0]), groups[groups.length-1] as any);
+        } else {
+            throw "invalid mass " + data;
+        }
+    }
+    serialize() {
+        return this.value + this.unit;
+    }
 
     static zero(unit: MassUnit = "kg") {
         return new Mass(0, unit);
@@ -134,6 +148,19 @@ export class Distance {
     private static UA_RAD = 1.496;
     private static AL_RAD = 9.5;
 
+    static parse(data: string) {
+        if(!data) { return undefined; }
+        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
+        if(groups) {
+            return new Distance(parseFloat(groups[0]), groups[groups.length-1] as any);
+        } else {
+            throw "invalid Distance " + data;
+        }
+    }
+    serialize() {
+        return this.value + this.unit;
+    }
+
     static zero(unit: DistanceUnit = "al") {
         return new Distance(0, unit);
     }
@@ -210,6 +237,19 @@ export class Temperature {
     private static C_RAD = 273.15;
     private static F_RAD = 459.67;
 
+    static parse(data: string) {
+        if(!data) { return undefined; }
+        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
+        if(groups) {
+            return new Temperature(parseFloat(groups[0]), groups[groups.length-1] as any);
+        } else {
+            throw "invalid Temperature " + data;
+        }
+    }
+    serialize() {
+        return this.value + this.unit;
+    }
+
     static k(value: number) { return new Temperature(value, "K"); }
     static c(value: number) { return new Temperature(value, "C"); }
     static f(value: number) { return new Temperature(value, "F"); }
@@ -262,6 +302,19 @@ export class Time {
 
     static zero(unit: TimeUnit = "d") {
         return new Time(0, unit);
+    }
+
+    static parse(data: string) {
+        if(!data) { return undefined; }
+        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
+        if(groups) {
+            return new Time(parseFloat(groups[0]), groups[groups.length-1] as any);
+        } else {
+            throw "invalid Time " + data;
+        }
+    }
+    serialize() {
+        return this.value + this.unit;
     }
 
     constructor(private value: number, public unit: TimeUnit) {
@@ -330,14 +383,45 @@ export class Time {
 }
 
 export class Appearance {
+    static parse(data: any) {
+        if(!data) { return undefined; }
+        return new Appearance(data.brightness || 0, data.oclass, data.colors);
+    }
+    serialize() {
+        return _.pickBy(Object.assign({}, this), _.identity);
+    }
+
     constructor(public brightness: number, public oclass?: string, public colors: string[] = []) {}
 }
 
 export class PhysicalProperties {
+    static parse(data: any) {
+        return new PhysicalProperties(Distance.parse(data.radius), Mass.parse(data.mass), Temperature.parse(data.temperature));
+    }
+    serialize() {
+        return _.pickBy({
+            radius: this.radius?.serialize(),
+            mass: this.mass?.serialize(),
+            temperature: this.temperature?.serialize()
+        }, _.identity);
+    }
+
     constructor(public radius = Distance.zero(), public mass = Mass.zero(), public temperature = Temperature.zero()) {}
 }
 
 export class OrbitalProperties {
+    static parse(data: any) {
+        if(!data) { return undefined; }
+        return new OrbitalProperties(Distance.parse(data.semiMajorAxis) || Distance.zero(), data.excentricity, Time.parse(data.period) || Time.zero(), data.tilt);
+    }
+    serialize() {
+        return _.pickBy({
+            semiMajorAxis: this.semiMajorAxis?.serialize(),
+            excentricity: this.excentricity || 0,
+            period: this.period?.serialize(),
+            tilt: this.tilt || 0
+        }, _.identity)
+    }
 
     static origin() {
         return new OrbitalProperties(Distance.zero(), 0, Time.zero(), 0);
@@ -353,9 +437,33 @@ export class OrbitalProperties {
 }
 
 export class System {
+    public _uid!: string;
     public readonly mass: Mass;
     public readonly temperature: number;
     public readonly brightness: number;
+
+    static parse(data: any) {
+        let objs: CelestialObject[] = []
+        for(let obj of data.objects || []) {
+            objs.push(obj instanceof CelestialObject ? obj : parseCelestrial(obj));
+        }
+        let system = new System(data.names || [], data.coordinate, objs);
+        system._uid = data._uid;
+        return system;
+    }
+    serialize() {
+        let data: any[] = []
+        for(let obj of this.objects) {
+            data.push(obj.serialize());
+        }
+        return _.pickBy({
+            _uid: this._uid,
+            coordinate: this.coordinate,
+            names: this.names,
+            objects: data
+        }, _.identity)
+    }
+
     constructor(public names: string[], public coordinate: Coordinate, public objects: CelestialObject[]) {
         this.mass = new Mass(0);
         let temperatureSum = 0;
@@ -374,7 +482,19 @@ export class System {
 }
 
 export class CelestialObject {
+    public _uid!: string;
     constructor(public names: string[], public orbital = OrbitalProperties.origin(), public physical: PhysicalProperties, public appearance: Appearance) {}
+
+    serialize() {
+        return _.pickBy({
+            _uid: this._uid,
+            _type: this.constructor.name,
+            names: this.names,
+            orbital: this.orbital?.serialize(),
+            physical: this.physical?.serialize(),
+            appearance: this.appearance?.serialize()
+        }, _.identity)
+    }
 }
 
 export class Star extends CelestialObject {
@@ -393,4 +513,27 @@ export class Moon extends CelestialObject {
 
 export class Asteroid extends CelestialObject {
     constructor(names: string[], orbital: OrbitalProperties|undefined, public physical: PhysicalProperties, appearance: Appearance) {  super(names, orbital, physical, appearance); }
+}
+
+export function parseCelestrial(data: any) {
+    let c: CelestialObject;
+    switch(data._type) {
+        case "Star":
+            c = new Star(data.names || [], PhysicalProperties.parse(data.physical), Appearance.parse(data.appearance), OrbitalProperties.parse(data.orbital));
+            break;
+        case "Planet":
+            c = new Planet(data.names || [], OrbitalProperties.parse(data.orbital), PhysicalProperties.parse(data.physical), Appearance.parse(data.appearance) || new Appearance(1));
+            break;
+        case "Moon":
+            c = new Moon(data.names || [], OrbitalProperties.parse(data.orbital), PhysicalProperties.parse(data.physical), Appearance.parse(data.appearance) || new Appearance(1));
+            break;
+        case "Asteroid":
+            c = new Asteroid(data.names || [], OrbitalProperties.parse(data.orbital), PhysicalProperties.parse(data.physical), Appearance.parse(data.appearance) || new Appearance(1));
+            break;
+        default:
+            c = new CelestialObject(data.names || [], OrbitalProperties.parse(data.orbital), PhysicalProperties.parse(data.physical), Appearance.parse(data.appearance) || new Appearance(1));
+            break;
+    }
+    c._uid = data._uid;
+    return c;
 }

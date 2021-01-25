@@ -34,6 +34,7 @@ import { timeStr } from "./navigation.service"
 import { IPoint, Point, Rectangle, Segment, Vector } from "../framework/geometry";
 import map from "./map.module";
 import _ from "lodash";
+import {SystemIo} from "../astrometrics/astrometrics.service"
 
 const AL_PX = 10;
 
@@ -46,54 +47,10 @@ export default class ViewportComponent extends Vue {
 
   distance: Distance | null = null;
   labelPos: {x: number, y: number} | null = null;
-  allSystems = [
-    new System(["Sol", "Terre"], {x:0, y:0, unit:"al"}, [
-      new Star(
-        ["Sun"], 
-        undefined, 
-        new Appearance(1, "G"))
-    ]), 
-    new System(["Procyon", "Andoria"], {x:6.75, y:9.75, unit:"al"}, [
-      new Star(
-        ["Procyon A"], 
-        new PhysicalProperties(Distance.sunRadius(2.048), Mass.sun(1.42), Temperature.k(6550)),
-        new Appearance(7.73, "A")),
-      new Star(
-        ["Procyon B"], 
-        new PhysicalProperties(Distance.sunRadius(.02), Mass.sun(.6), Temperature.k(9700)),
-        new Appearance(.00055, "A"),
-        new OrbitalProperties(new Distance(14, "ua"), 0.407, new Time(40.82, "y"), 31.1))
-    ]),
-    new System(["40 Eridani", "Vulcain"], {x:4.6875, y:12.375, unit:"al"}, [
-      new Star(
-        ["40 Eridani A"], 
-        new PhysicalProperties(Distance.sunRadius(.81), Mass.sun(.84), Temperature.k(5200)),
-        new Appearance(.4, "G")),
-      new Star(
-        ["40 Eridani B"], 
-        new PhysicalProperties(Distance.sunRadius(.014), Mass.sun(.5), Temperature.k(16500)),
-        new Appearance(.013, "B")),
-      new Star(
-        ["40 Eridani C"], 
-        new PhysicalProperties(Distance.sunRadius(.31), Mass.sun(.2), Temperature.k(3100)),
-        new Appearance(.008, "M")),
-    ]),
-    new System(["Denobula"], {x:30.75, y:5.625, unit:"al"}, [
-      new Star(
-        ["Denobula Triaxa"], 
-        new PhysicalProperties(Distance.sunRadius(35), Mass.sun(150), Temperature.k(3100)),
-        new Appearance(4, "M")),
-    ]),
-    new System(["Lych"], {x:25.1, y:4.2, unit:"al"}, [
-      new Star(
-        ["PSR B1257+12"], 
-        new PhysicalProperties(new Distance(10, "km"), Mass.sun(1.4), Temperature.k(28856)),
-        new Appearance(5.2, "G")),
-    ])
-  ];
+  allSystems: System[] = []
   
-  mounted() {
-    console.log(JSON.stringify(this.allSystems));
+  async mounted() {
+    this.allSystems = await SystemIo.listAll();
   }
 
   get bounds() {
