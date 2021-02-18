@@ -13,11 +13,12 @@
 
     .selected-value {
         height: 36px;
+        cursor: pointer;
     }
     .select-options-container {
         position: absolute;
         top: 36px;
-        left: 0;
+        left: -10px;
         width: 100px;
         background-color: black;
         border: 1px solid white;
@@ -26,6 +27,7 @@
         overflow-y: auto;
         overflow-x: hidden;
         display: none;
+        z-index: 1000;
 
         &.visible {
             display: flex;
@@ -43,7 +45,7 @@ const isVisible = (elem: HTMLElement) => !!elem && !!( elem.offsetWidth || elem.
 
 function hideOnClickOutside(element: HTMLElement, cb: Function) {
     const outsideClickListener = (event: MouseEvent) => {
-        if (event.target && !element.contains(<Node> event.target) && isVisible(element)) {
+        if (event.target && element && !element.contains(<Node> event.target) && isVisible(element)) {
           removeClickListener()
           cb()
         }

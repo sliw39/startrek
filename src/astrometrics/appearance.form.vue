@@ -17,6 +17,7 @@
 import Vue from 'vue'
 import { Ref, Component, Prop, Emit, PropSync } from 'vue-property-decorator'
 import { Appearance } from '../map/objects.model';
+import { StarsImg } from './astrometrics.utils'
 
 @Component
 export default class FormAppearance extends Vue {
@@ -24,15 +25,7 @@ export default class FormAppearance extends Vue {
     readonly = false;
 
     get opts() {
-        return [
-            {key: "O", url: "/static/star/o.png"},
-            {key: "B", url: "/static/star/b.png"},
-            {key: "A", url: "/static/star/a.png"},
-            {key: "F", url: "/static/star/f.png"},
-            {key: "G", url: "/static/star/g.png"},
-            {key: "K", url: "/static/star/k.png"},
-            {key: "M", url: "/static/star/m.png"},
-        ]
+        return StarsImg;
     }
 }
 </script>

@@ -26,8 +26,33 @@ export interface Instant {
     coordinates: Coordinate;
 }
 
+export abstract class PhysicalQuantity<UNIT extends string> {
+    constructor(protected value: number, public unit: UNIT) {}
+
+    protected static parse(data: any, clazz: any): PhysicalQuantity<any> {
+        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
+        if(groups) {
+            return new clazz(parseFloat(groups[0]), groups[groups.length-1] as any);
+        } else {
+            throw `invalid ${clazz.constructor.name} ${data}`;
+        }
+    }
+
+    serialize(): string {
+        return this.value + this.unit;
+    }
+
+    print() {
+        return this.get() + this.unit;
+    }
+
+    abstract allUnits(): UNIT[];
+    abstract newInstance(value: number, unit?: UNIT): PhysicalQuantity<UNIT>;
+    abstract get(unit?: UNIT): number;
+}
+
 export type MassUnit = "g" | "kg" | "ton" | "kton" | "moon" | "earth" | "jupiter" | "sun";
-export class Mass {
+export class Mass extends PhysicalQuantity<MassUnit> {
     private stdValue: number;
     private readonly exp: number;
     private static MOON_RAD = 7.347;
@@ -35,16 +60,8 @@ export class Mass {
     private static JUP_RAD = 1.898;
     private static SUN_RAD = 1.989;
   
-    static parse(data: string) {
-        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
-        if(groups) {
-            return new Mass(parseFloat(groups[0]), groups[groups.length-1] as any);
-        } else {
-            throw "invalid mass " + data;
-        }
-    }
-    serialize() {
-        return this.value + this.unit;
+    static parse(data: string): Mass {
+        return PhysicalQuantity.parse(data, Mass) as Mass;
     }
 
     static zero(unit: MassUnit = "kg") {
@@ -67,7 +84,8 @@ export class Mass {
         return new Mass(1*factor, "jupiter")
     }
 
-    constructor(private value: number, public unit: MassUnit = "kg") {
+    constructor(value: number, unit: MassUnit = "kg") {
+        super(value, unit);
         switch(unit) {
             case "g":
                 this.stdValue = this.value;
@@ -99,8 +117,12 @@ export class Mass {
                 break;
             default:
                 this.stdValue = this.value;
-                this.exp = 1;
+                this.exp = 0;
         }
+    }
+
+    allUnits() {
+        return ["g", "kg", "ton", "kton", "moon", "earth", "jupiter", "sun"] as MassUnit[];
     }
 
     get(unit: MassUnit = this.unit) {
@@ -112,15 +134,15 @@ export class Mass {
             case "kton":
                 return this.stdValue * Math.pow(10, this.exp - 6);
             case "moon":
-                return this.stdValue / (Mass.MOON_RAD * Math.pow(10, this.exp - 22));
+                return (this.stdValue / Mass.MOON_RAD) * Math.pow(10, this.exp - 22);
             case "earth":
-                return this.stdValue / (Mass.EARTH_RAD * Math.pow(10, this.exp - 24));
+                return (this.stdValue / Mass.EARTH_RAD) * Math.pow(10, this.exp - 24);
             case "jupiter":
-                return this.stdValue / (Mass.JUP_RAD * Math.pow(10, this.exp - 27));
+                return (this.stdValue / Mass.JUP_RAD) * Math.pow(10, this.exp - 27);
             case "sun":
-                return this.stdValue / (Mass.SUN_RAD * Math.pow(10, this.exp - 30));
+                return (this.stdValue / Mass.SUN_RAD) * Math.pow(10, this.exp - 30);
             default:
-                return this.stdValue;
+                return this.stdValue * Math.pow(10, this.exp);
         }
     }
 
@@ -129,6 +151,10 @@ export class Mass {
             mass = new Mass(mass, unit);
         }
         this.stdValue += mass.get("kg");
+    }
+
+    newInstance(value: number, unit?: MassUnit): Mass {
+        return new Mass(value, unit);
     }
 
     get g() { return this.get("g"); }
@@ -142,23 +168,14 @@ export class Mass {
 }
 
 export type DistanceUnit = "km" | "mkm" | "ua" | "al";
-export class Distance {
+export class Distance extends PhysicalQuantity<DistanceUnit> {
     private stdValue: number;
     private readonly exp: number;
     private static UA_RAD = 1.496;
     private static AL_RAD = 9.5;
 
     static parse(data: string) {
-        if(!data) { return undefined; }
-        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
-        if(groups) {
-            return new Distance(parseFloat(groups[0]), groups[groups.length-1] as any);
-        } else {
-            throw "invalid Distance " + data;
-        }
-    }
-    serialize() {
-        return this.value + this.unit;
+        return PhysicalQuantity.parse(data, Distance) as Distance;
     }
 
     static zero(unit: DistanceUnit = "al") {
@@ -181,7 +198,8 @@ export class Distance {
         return new Distance(Math.abs(c2.x - c1.x) + Math.abs(c2.y - c1.y), c1.unit);
     }
 
-    constructor(private value: number, public unit: DistanceUnit = "km") {
+    constructor(value: number, unit: DistanceUnit = "km") {
+        super(value, unit);
         switch(unit) {
             case "mkm":
                 this.stdValue = this.value;
@@ -197,8 +215,12 @@ export class Distance {
                 break;
             default:
                 this.stdValue = this.value;
-                this.exp = 1;
+                this.exp = 0;
         }
+    }
+
+    allUnits() {
+        return ["km", "mkm", "ua", "al"] as DistanceUnit[]
     }
 
     get(unit: DistanceUnit = this.unit) {
@@ -206,11 +228,11 @@ export class Distance {
             case "mkm":
                 return this.stdValue * Math.pow(10, this.exp - 6);
             case "ua":
-                return this.stdValue / (Distance.UA_RAD * Math.pow(10, this.exp - 8));
+                return (this.stdValue / Distance.UA_RAD) * Math.pow(10, this.exp - 8);
             case "al":
-                return this.stdValue / (Distance.AL_RAD * Math.pow(10, this.exp - 12));
+                return (this.stdValue / Distance.AL_RAD) * Math.pow(10, this.exp - 12);
             default:
-                return this.stdValue;
+                return this.stdValue * Math.pow(10, this.exp);
         }
     }
 
@@ -221,33 +243,24 @@ export class Distance {
         this.stdValue += dist.get("km");
     }
 
-    get km() { return this.get("mkm") * 1000; }
+    newInstance(value: number, unit?: DistanceUnit): Distance {
+        return new Distance(value, unit);
+    }
+
+    get km() { return this.get("km"); }
     get mkm() { return this.get("mkm"); }
     get ua() { return this.get("ua"); }
     get al() { return this.get("al"); }
-
-    print() {
-        return this.get() + this.unit;
-    }
 }
 
 export type TemperatureUnit = "K" | "C" | "F";
-export class Temperature {
+export class Temperature extends PhysicalQuantity<TemperatureUnit> {
     private stdValue: number;
     private static C_RAD = 273.15;
     private static F_RAD = 459.67;
 
     static parse(data: string) {
-        if(!data) { return undefined; }
-        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
-        if(groups) {
-            return new Temperature(parseFloat(groups[0]), groups[groups.length-1] as any);
-        } else {
-            throw "invalid Temperature " + data;
-        }
-    }
-    serialize() {
-        return this.value + this.unit;
+        return PhysicalQuantity.parse(data, Temperature) as Temperature;
     }
 
     static k(value: number) { return new Temperature(value, "K"); }
@@ -262,7 +275,8 @@ export class Temperature {
         return Temperature.k(5500);
     }
 
-    constructor(private value: number, public unit: TemperatureUnit = "K") {
+    constructor(value: number, unit: TemperatureUnit = "K") {
+        super(value, unit);
         switch(unit) {
             case "K":
                 this.stdValue = this.value;
@@ -276,6 +290,10 @@ export class Temperature {
         }
     }
 
+    allUnits() {
+        return ["K", "C", "F"] as TemperatureUnit[];
+    }
+
     get(unit: TemperatureUnit = this.unit) {
         switch(unit) {
             case "K":
@@ -287,17 +305,17 @@ export class Temperature {
         }
     }
 
+    newInstance(value: number, unit?: TemperatureUnit): Temperature {
+        return new Temperature(value, unit);
+    }
+
     get k() { return this.get("K"); }
     get c() { return this.get("C"); }
     get f() { return this.get("F"); }
-
-    print() {
-        return this.get() + this.unit;
-    }
 }
 
 export type TimeUnit = "ms" | "s" | "m" | "h" | "d" | "w" | "y";
-export class Time {
+export class Time extends PhysicalQuantity<TimeUnit> {
     private stdValue: number;
 
     static zero(unit: TimeUnit = "d") {
@@ -305,19 +323,11 @@ export class Time {
     }
 
     static parse(data: string) {
-        if(!data) { return undefined; }
-        let groups = /(-?[0-9]+(\.[0-9]+)?(e-?[0-9]+)?)\s*(\w+)/g.exec(data);
-        if(groups) {
-            return new Time(parseFloat(groups[0]), groups[groups.length-1] as any);
-        } else {
-            throw "invalid Time " + data;
-        }
-    }
-    serialize() {
-        return this.value + this.unit;
+        return PhysicalQuantity.parse(data, Time) as Time;
     }
 
-    constructor(private value: number, public unit: TimeUnit) {
+    constructor(value: number, unit: TimeUnit = "d") {
+        super(value, unit);
         switch(unit) {
             case "ms":
                 this.stdValue = this.value / 1000;
@@ -343,30 +353,31 @@ export class Time {
         }
     }
 
+    allUnits() {
+        return ["ms", "s", "m", "h", "d", "w", "y"] as TimeUnit[]
+    }
+
     get(unit: TimeUnit = this.unit) {
         switch(unit) {
             case "ms":
-                this.stdValue = this.value * 1000;
-                break;
+                return this.stdValue * 1000;
             case "s":
-                this.stdValue = this.value;
-                break;
+                return this.stdValue;
             case "m":
-                this.stdValue = this.value / 60;
-                break;
+                return this.stdValue / 60;
             case "h":
-                this.stdValue = this.value / 3600;
-                break;
+                return this.stdValue / 3600;
             case "d":
-                this.stdValue = this.value / 24 / 3600;
-                break;
+                return this.stdValue / 24 / 3600;
             case "w":
-                this.stdValue = this.value / 7 / 24 / 3600;
-                break;
+                return this.stdValue / 7 / 24 / 3600;
             case "y":
-                this.stdValue = this.value / 365 / 7 / 24 / 3600;
-                break;
+                return this.stdValue / 365 / 7 / 24 / 3600;
         }
+    }
+
+    newInstance(value: number, unit?: TimeUnit): Time {
+        return new Time(value, unit);
     }
 
     get ms() { return this.get("ms"); }
@@ -376,10 +387,6 @@ export class Time {
     get d() { return this.get("d"); }
     get w() { return this.get("w"); }
     get y() { return this.get("y"); }
-
-    print() {
-        return this.get() + this.unit;
-    }
 }
 
 export class Appearance {
@@ -445,6 +452,9 @@ export class System {
     static parse(data: any) {
         let objs: CelestialObject[] = []
         for(let obj of data.objects || []) {
+            if(typeof obj === "string") {
+                continue;
+            }
             objs.push(obj instanceof CelestialObject ? obj : parseCelestrial(obj));
         }
         let system = new System(data.names || [], data.coordinate, objs);
@@ -483,12 +493,14 @@ export class System {
 
 export class CelestialObject {
     public _uid!: string;
+    public _parent!: string;
     constructor(public names: string[], public orbital = OrbitalProperties.origin(), public physical: PhysicalProperties, public appearance: Appearance) {}
 
     serialize() {
         return _.pickBy({
             _uid: this._uid,
             _type: this.constructor.name,
+            _parent: this._parent,
             names: this.names,
             orbital: this.orbital?.serialize(),
             physical: this.physical?.serialize(),
@@ -535,5 +547,6 @@ export function parseCelestrial(data: any) {
             break;
     }
     c._uid = data._uid;
+    c._parent = data._parent;
     return c;
 }

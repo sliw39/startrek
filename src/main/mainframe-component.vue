@@ -8,7 +8,7 @@
     <section-component class="content" :title="category" color="yellow">
         <map-component v-if="category === 'Map'"></map-component>
         <main-msg-component v-if="category === 'Messages'"></main-msg-component>
-        <form-system v-if="category === 'Astrometric'"></form-system>
+        <astrometrics-component v-if="category === 'Astrometric'"></astrometrics-component>
     </section-component>
 </div>
 </template>
@@ -31,12 +31,12 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import FormSystem from "../astrometrics/system.form.vue";
+import AstrometricsComponent from "../astrometrics/astrometrics.form.vue";
 import MapComponent from "../map/map-component.vue";
 import MainMsgComponent from "../messages/main-msg-component.vue";
 
 @Component({
-    components: { MapComponent, MainMsgComponent, FormSystem }
+    components: { MapComponent, MainMsgComponent, AstrometricsComponent }
 })
 export default class MainframeComponent extends Vue {
     category = 'Astrometric'

@@ -10,6 +10,12 @@
     height: 100%;
     width: 100%;
     position: relative;
+    display: flex;
+    flex-direction: column;
+
+    > * {
+      flex: 1
+    }
 
     .toolbar {
       position: absolute;
@@ -21,14 +27,18 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
+import { CollapsibleElement } from "../framework/collapsible-component"
 import ViewportComponent from "./viewport-component.vue";
 import ToolbarComponent from "./toolbar-component.vue";
 import SettingsComponent from "./settings-component.vue";
-import { Coordinate, System } from "./objects.model";
+import map from "./map.module";
+import { StarsImg } from "../astrometrics/astrometrics.utils";
 
 @Component({
   components: { ViewportComponent, ToolbarComponent, SettingsComponent }
 })
-export default class MapComponent extends Vue {}
+export default class MapComponent extends Vue {
+  
+}
 </script>

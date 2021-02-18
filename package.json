@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "compile": "tsc src/test.ts",
-    "start:dev": "webpack serve"
+    "start:dev": "webpack serve --port 8080"
   },
   "author": "",
   "license": "ISC",

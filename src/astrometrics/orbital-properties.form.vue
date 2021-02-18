@@ -2,11 +2,11 @@
     <div class="orbital-properties">
         <div class="row">
             <span>Demi-Axe Majeur</span>
-            <form-distance v-model="props.semiMajorAxis" :readonly="readonly"></form-distance>
+            <form-phy-qty v-model="props.semiMajorAxis" :readonly="readonly"></form-phy-qty>
         </div>
         <div class="row">
             <span>Période</span>
-            <form-time v-model="props.period" :readonly="readonly"></form-time>
+            <form-phy-qty v-model="props.period" :readonly="readonly"></form-phy-qty>
         </div>
         <div class="row">
             <span>Excentricité</span>
@@ -22,19 +22,21 @@
 </template>
 
 <style lang="less">
-
+.row {
+    > span:first-of-type {
+        width: 200px;
+    }
+}
 </style>
 
 <script lang="ts">
 import Vue from 'vue'
-import { Ref, Component, Prop, Emit, PropSync } from 'vue-property-decorator'
+import { Component, PropSync } from 'vue-property-decorator'
 import { OrbitalProperties } from '../map/objects.model';
-import FormMass from "./mass.form.vue"
-import FormDistance from "./distance.form.vue"
-import FormTime from "./time.form.vue"
+import FormPhyQty from "./physical-quantity.form.vue";
 
 @Component({
-    components: { FormMass, FormDistance, FormTime }
+    components: { FormPhyQty }
 })
 export default class FormOrbitalProperties extends Vue {
     @PropSync("value", OrbitalProperties) props!: OrbitalProperties;

@@ -10,6 +10,8 @@
         <div class="right" @click="move('right')">o</div>
         <div class="down" @click="move('down')">o</div>
     </div>
+
+    <search-form @value="findCelestrial"></search-form>
 </div>
 </template>
 
@@ -73,9 +75,13 @@
 import { Component, Vue, Prop, Emit } from "vue-property-decorator";
 import { System } from "./objects.model";
 import map from "./map.module";
+import { SystemIo } from "../astrometrics/astrometrics.service";
+import SearchForm from "../astrometrics/search.form.vue";
 
-@Component
-export default class StarComponent extends Vue {
+@Component({
+    components: { SearchForm }
+})
+export default class ToolbarComponent extends Vue {
 
   zoomIn() {
     map.zoomIn();
@@ -87,6 +93,13 @@ export default class StarComponent extends Vue {
 
   move(dir: "up" | "down" | "left" | "right") {
     map.move({dir, amount: 15});
+  }
+
+  async findCelestrial(uid: string) {
+    let sys = await SystemIo.get(uid);
+    if(sys) {
+      map.selectSystem(sys);
+    }
   }
 }
 </script>
