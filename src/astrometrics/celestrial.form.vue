@@ -25,7 +25,9 @@
     <form-orbital-properties v-model="obj.orbital"></form-orbital-properties>
     <form-appearance v-model="obj.appearance"></form-appearance>
     <form-physical-properties v-model="obj.physical"></form-physical-properties>
+    
     <button-component @click="$emit('save')" color="green">Enregistrer</button-component>
+    <button-component @click="$emit('remove')" color="red" v-if="obj._uid">Supprimer</button-component>
   </div>
 </template>
 

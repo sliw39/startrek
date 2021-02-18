@@ -11,7 +11,7 @@
       ></collapsible-component>
     </div>
     <div class="forms-container" v-if="selectedData">
-      <celestrial-form v-model="selectedData" @save="save"></celestrial-form>
+      <celestrial-form v-model="selectedData" @save="save" @remove="remove"></celestrial-form>
     </div>
   </div>
 </template>
@@ -115,6 +115,21 @@ export default class AstrometricsComponent extends Vue {
         await CelestrialIo.upsert(this.selectedData);
       }
       await this.selectSystem(this.selectedSystem.id);
+    }
+  }
+
+  async remove() {
+    if (this.selectedData && this.selectedSystem) {
+      await CelestrialIo.remove(this.selectedData._uid);
+      let system = await SystemIo.get(this.selectedData._parent);
+      if (system) {
+        let idx = system.objects.findIndex(s => s._uid === this.selectedData?._uid);
+        if(idx >= 0) {
+          system.objects.splice(idx, 1);
+          await SystemIo.upsert(system);
+        }
+      }
+      this.selectedSystem = null;
     }
   }
 }

@@ -121,6 +121,10 @@ export namespace CelestrialIo {
     return parseCelestrial(data);
   }
 
+  export async function remove(uid: string) {
+    await db.collection("celestrial").doc(uid).delete();
+  }
+
   export async function find(query: string) {
     return (await db.collection("celestrial").where("names", "array-contains", query).get()).docs.map(doc => parseCelestrial(doc.data()));
   }
