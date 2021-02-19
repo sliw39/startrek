@@ -1,6 +1,14 @@
 import { CelestialObject, parseCelestrial, System } from "../map/objects.model";
 import { db } from "../db";
 
+function mapUid(doc: firebase.firestore.DocumentSnapshot): firebase.firestore.DocumentData | undefined {
+  let data: any = doc.data()
+  if (data && !data._uid) {
+    data._uid = doc.id;
+  }
+  return data;
+}
+
 export namespace SystemIo {
   export async function upsert(system: System) {
     let objects = system.objects;
@@ -35,8 +43,13 @@ export namespace SystemIo {
   }
 
   export async function get(id: string) {
+    if(!id) return undefined;
     let doc = await db.collection("system").doc(id).get()
-    return parseDocument(doc);
+    return doc.exists ? parseDocument(doc) : undefined;
+  }
+
+  export async function exists(id: string) {
+    return (await db.collection("system").doc(id).get()).exists;
   }
 
   export async function find(query: string, deep = false) {
@@ -48,7 +61,9 @@ export namespace SystemIo {
     if (deep) {
       let promises: Promise<System | undefined>[] = []
       for (let doc of result.docs) {
-        promises.push(parseDocument(doc, query));
+        if(doc.exists) {
+          promises.push(parseDocument(doc, query));
+        }
       }
       return (await Promise.all(promises)).filter(e => e !== undefined) as System[];
     } else {
@@ -71,14 +86,6 @@ export namespace SystemIo {
     return System.parse(data);
   }
 
-  function mapUid(doc: firebase.firestore.DocumentSnapshot): firebase.firestore.DocumentData | undefined {
-    let data: any = doc.data()
-    if (data && !data._uid) {
-      data._uid = doc.id;
-    }
-    return data;
-  }
-
   function arrayContains(array: string[], filter: string) {
     for (let word of array) {
       if (word.indexOf(filter) !== -1) {
@@ -91,6 +98,7 @@ export namespace SystemIo {
 }
 
 export namespace CelestrialIo {
+
   export async function upsert(celestrial: CelestialObject) {
     if (celestrial._uid) {
       await db.collection("celestrial").doc(celestrial._uid).update(celestrial.serialize());
@@ -113,12 +121,7 @@ export namespace CelestrialIo {
 
   export async function get(id: string) {
     let doc = await db.collection("celestrial").doc(id).get();
-    let data = doc.data();
-    if (!data) {
-      return undefined;
-    }
-    data._uid = id;
-    return parseCelestrial(data);
+    return doc.exists ? parseCelestrial(mapUid(doc)) : undefined;
   }
 
   export async function remove(uid: string) {
@@ -126,6 +129,13 @@ export namespace CelestrialIo {
   }
 
   export async function find(query: string) {
-    return (await db.collection("celestrial").where("names", "array-contains", query).get()).docs.map(doc => parseCelestrial(doc.data()));
+    return (await db.collection("celestrial").where("names", "array-contains", query).get()).docs.map(doc => parseCelestrial(mapUid(doc)));
+  }
+
+  export async function getChildren(parentUid: string) {
+    if(!parentUid) {
+      return []
+    }
+    return (await db.collection("celestrial").where("_parent", "==", parentUid).orderBy("orbital.semiMajorAxis").get()).docs.map(doc => parseCelestrial(mapUid(doc)));
   }
 }

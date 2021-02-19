@@ -413,13 +413,13 @@ export class PhysicalProperties {
         }, _.identity);
     }
 
-    constructor(public radius = Distance.zero(), public mass = Mass.zero(), public temperature = Temperature.zero()) {}
+    constructor(public radius = Distance.zero("km"), public mass = Mass.zero("earth"), public temperature = Temperature.zero()) {}
 }
 
 export class OrbitalProperties {
     static parse(data: any) {
         if(!data) { return undefined; }
-        return new OrbitalProperties(Distance.parse(data.semiMajorAxis) || Distance.zero(), data.excentricity, Time.parse(data.period) || Time.zero(), data.tilt);
+        return new OrbitalProperties(Distance.parse(data.semiMajorAxis) || Distance.zero("ua"), data.excentricity, Time.parse(data.period) || Time.zero("d"), data.tilt);
     }
     serialize() {
         return _.pickBy({
@@ -431,7 +431,7 @@ export class OrbitalProperties {
     }
 
     static origin() {
-        return new OrbitalProperties(Distance.zero(), 0, Time.zero(), 0);
+        return new OrbitalProperties(Distance.zero("ua"), 0, Time.zero(), 0);
     }
 
     constructor(

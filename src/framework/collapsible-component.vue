@@ -47,7 +47,7 @@
               class="add-elt"
               :class="direction === 'vertical' ? 'horizontal' : 'vertical'"
               color="green"
-              @click="addSatelite({parent: satelite, type: type})"
+              @click="addSatelite({ parent: satelite, type: type })"
               >+</button-component
             >
           </div>
@@ -57,7 +57,8 @@
           :key="type"
           class="add-elt"
           color="green"
-          @click="addSatelite({parent: main, type: type})"
+          :class="direction"
+          @click="addSatelite({ parent: main, type: type })"
           >+</button-component
         >
       </div>
@@ -70,6 +71,12 @@
   display: flex;
   position: relative;
   align-items: flex-start;
+
+  .satelites {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+  }
 
   .element.element-main {
     position: relative;
@@ -98,6 +105,8 @@
         height: 20px;
         width: 100px;
         left: 10px;
+        top: auto;
+        bottom: -20px;
       }
     }
     > .horizontal {
@@ -121,16 +130,26 @@
     color: white;
     position: absolute;
     min-width: 0;
+
+    &.vertical {
+      height: 20px;
+      width: 100px;
+      left: 10px;
+      bottom: -20px;
+      top: auto;
+    }
+
+    &.horizontal {
+      width: 20px;
+      height: 100px;
+      top: 10px;
+      left: auto;
+      right: -20px;
+    }
   }
 
   &.vertical {
     flex-direction: column;
-
-    .add-elt {
-      height: 20px;
-      width: 100px;
-      left: 10px;
-    }
 
     .lifeline {
       left: 55px;
@@ -141,12 +160,6 @@
   }
   &.horizontal {
     flex-direction: row;
-
-    .add-elt {
-      width: 20px;
-      height: 100px;
-      top: 10px;
-    }
 
     .lifeline {
       top: 55px;
@@ -174,7 +187,7 @@ export default class CollapsibleComponent extends Vue {
   @Prop({ type: String, default: "vertical" }) direction!:
     | "vertical"
     | "horizontal";
-  @Prop({ type: Object, required: false }) siblings!: CollapsibleElement[];
+  @Prop({ type: Array, required: false }) siblings!: CollapsibleElement[];
   @Prop({ type: Boolean, default: false }) edit!: boolean;
   collapsed = false;
 
@@ -197,13 +210,10 @@ export default class CollapsibleComponent extends Vue {
         (d) => d.size || 0
       )
     );
-    return 50 - Math.max(0.1, radius / max) * 50 + "px";
+    return 50 - Math.max(0.01, radius / max) * 50 + "px";
   }
 
-  addSatelite(data: {
-    parent: CollapsibleElement, 
-    type: string 
-  }) {
+  addSatelite(data: { parent: CollapsibleElement; type: string }) {
     this.$emit("addsatelite", data);
   }
 }

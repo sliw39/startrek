@@ -60,6 +60,7 @@
 </style>
 
 <script lang="ts">
+import { result } from 'lodash';
 import Vue from 'vue'
 import { Component, Emit, Watch, Prop } from 'vue-property-decorator'
 import { CelestrialIo, SystemIo } from './astrometrics.service';
@@ -95,6 +96,13 @@ export default class FormCelestrial extends Vue {
                     id: cel._uid,
                     text: cel.names[0],
                     icon: "icon-star"
+                });
+            }
+            if(results.length === 0) {
+                results.push({
+                    id: "NEW",
+                    text: "Nouveau system",
+                    icon: "icon-system"
                 });
             }
             this.results = results;

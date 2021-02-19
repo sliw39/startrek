@@ -10,7 +10,7 @@
             <input type="text" v-model="system.names[i+1]">
             <button-component :corners="6" color="red" @click="system.names.splice(i+1, 1)">Effacer</button-component>
         </div>
-        <button-component class="add-name" color="green" @click="system.names.push('')">Nouveau nom</button-component>
+        <button-component class="add-name" color="green" @click="system.names.push('')">+ Nouveau nom</button-component>
         <div class="row main-name">
             <span>Coordonnées</span>
             <form-coordinates v-model="system.coordinate" :available-units="['al']"></form-coordinates>
@@ -31,8 +31,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Prop, Component, PropSync } from 'vue-property-decorator';
-import { CelestialObject, Star, System } from '../map/objects.model';
+import { Component, PropSync } from 'vue-property-decorator';
+import { Star, System } from '../map/objects.model';
 import FormCoordinates from "./coordinates.form.vue";
 import FormCelestrial from "./celestrial.form.vue";
 import _ from "lodash";
