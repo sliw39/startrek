@@ -3,7 +3,7 @@
     class="star" 
     ref="star"
     @click="$emit('clicked')" 
-    :class="classes()"
+    :class="classes"
     :style="{left: x+'px', top: y+'px'}">&nbsp;<span class="name">{{system.names[0]}}</span>&nbsp;<span class="subname" v-if="system.names[1]">({{system.names[1]}})</span></div>
 </template>
 
@@ -18,7 +18,7 @@ export default class StarComponent extends Vue {
   @Prop(Number) y!: number;
   @Prop({type: Boolean, default: false}) selected!: boolean;
 
-  classes() {
+  get classes() {
       let classes: any = { 'selected': this.selected };
 
       let color: string;

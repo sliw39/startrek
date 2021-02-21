@@ -1,14 +1,12 @@
 <template>
 <div class="mainframe">
     <section-component class="menu" title="Menu" color="yellow">
-        <button-component :corners="6" @click="category = 'Messages'" :color="category === 'Messages' ? 'red': 'yellow'">Messages</button-component>
-        <button-component :corners="6" @click="category = 'Map'" :color="category === 'Map' ? 'red': 'yellow'">Carte</button-component>
-        <button-component :corners="6" @click="category = 'Astrometric'" :color="category === 'Astrometric' ? 'red': 'yellow'">Astrométrie</button-component>
+        <router-link :to="route.path" custom v-slot="{isActive, navigate}" v-for="route in $router.getRoutes()" :key="route.name">
+            <button-component :corners="6" @click="navigate" :color="isActive ? 'red': 'yellow'">{{route.name}}</button-component>
+        </router-link>
     </section-component>
     <section-component class="content" :title="category" color="yellow">
-        <map-component v-if="category === 'Map'"></map-component>
-        <main-msg-component v-if="category === 'Messages'"></main-msg-component>
-        <astrometrics-component v-if="category === 'Astrometric'"></astrometrics-component>
+        <router-view></router-view>
     </section-component>
 </div>
 </template>
@@ -31,6 +29,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
+import { Route } from "vue-router";
 import AstrometricsComponent from "../astrometrics/astrometrics.form.vue";
 import MapComponent from "../map/map-component.vue";
 import MainMsgComponent from "../messages/main-msg-component.vue";
@@ -39,6 +38,14 @@ import MainMsgComponent from "../messages/main-msg-component.vue";
     components: { MapComponent, MainMsgComponent, AstrometricsComponent }
 })
 export default class MainframeComponent extends Vue {
-    category = 'Astrometric'
+    category = ''
+    mounted() {
+        this.$router.afterEach((to: Route) => {
+            if(to.name) {
+                this.category = to.name
+            }
+        })
+        this.category = this.$route.name || "";
+    }
 }
 </script>
