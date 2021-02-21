@@ -12,12 +12,15 @@
     </div>
     <div class="forms-container" v-if="selectedSystem">
       <celestrial-form
-        v-if="selectedValue"
+        v-if="selectedData"
         v-model="selectedData"
         @save="save"
         @remove="remove"
       ></celestrial-form>
-      <system-form v-else v-model="selectedSystem"></system-form>
+      <system-form v-else v-model="selectedSystemData"
+        @save="saveSystem"
+        @remove="removeSystem"
+      ></system-form>
     </div>
   </div>
 </template>
@@ -166,6 +169,17 @@ export default class AstrometricsComponent extends Vue {
       }
       this.selectedSystem = null;
     }
+  }
+
+  async saveSystem() {
+    let system = this.selectedSystemData;
+    if(system) {
+        return await SystemIo.upsert(system);
+    }
+  }
+
+  async removeSystem() {
+      console.error("NIY")
   }
 }
 </script>

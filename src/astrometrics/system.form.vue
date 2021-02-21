@@ -15,9 +15,8 @@
             <span>Coordonnées</span>
             <form-coordinates v-model="system.coordinate" :available-units="['al']"></form-coordinates>
         </div>
-        <div class="suns">
-            <form-celestrial v-for="(aster, i) in stars" :key="aster.names[0]" v-model="stars[i]"></form-celestrial>
-        </div>
+        <button-component class="action" color="green" @click="$emit('save')">Enregistrer</button-component>
+        <button-component class="action" color="red" @click="$emit('remove')">Effacer</button-component>
     </div>
 </template>
 

@@ -468,7 +468,7 @@ export class System {
         }
         return _.pickBy({
             _uid: this._uid,
-            coordinate: this.coordinate,
+            coordinate: _.pickBy(this.coordinate, _.identity),
             names: this.names,
             objects: data
         }, _.identity)

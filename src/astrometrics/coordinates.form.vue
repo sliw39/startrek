@@ -1,8 +1,8 @@
 <template>
 <div class="form-coordinate">
-    <input type="number" v-model="coordinates.x">
+    <input type="number" v-model.number="coordinates.x">
     <span>/</span>
-    <input type="number" v-model="coordinates.y">
+    <input type="number" v-model.number="coordinates.y">
     <span>&nbsp;</span>
     <span v-if="availableUnits.length === 1">{{coordinates.unit}}</span>
     <select-component v-else v-model="coordinates.unit" :options="availableUnits"></select-component>

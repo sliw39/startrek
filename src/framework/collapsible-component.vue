@@ -72,6 +72,10 @@
   position: relative;
   align-items: flex-start;
 
+  &.vertical > .satelites {
+    flex-direction: column;
+  }
+
   .satelites {
     display: flex;
     flex-direction: row;

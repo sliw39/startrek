@@ -2,7 +2,7 @@
   <div class="celestrial-form">
     <div class="row main-name">
       <span>Nom standard</span>
-      <input type="text" v-model="obj.names[0]" />
+      <input type="text" v-model.trim="obj.names[0]" />
     </div>
     <span>Autres noms</span>
     <div
@@ -11,7 +11,7 @@
       :key="'sysname_' + i"
     >
       <span class="spacer">&nbsp;</span>
-      <input type="text" v-model="obj.names[i + 1]" />
+      <input type="text" v-model.trim="obj.names[i + 1]" />
       <button-component
         :corners="6"
         color="red"
@@ -25,7 +25,7 @@
     <form-orbital-properties v-model="obj.orbital"></form-orbital-properties>
     <form-appearance v-model="obj.appearance"></form-appearance>
     <form-physical-properties v-model="obj.physical"></form-physical-properties>
-    
+
     <button-component @click="$emit('save')" color="green">Enregistrer</button-component>
     <button-component @click="$emit('remove')" color="red" v-if="obj._uid">Supprimer</button-component>
   </div>

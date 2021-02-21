@@ -3,7 +3,7 @@
         <div class="row">
             <span>Luminosité</span>
             <span v-if="readonly">{{props.brightness}}</span>
-            <input v-else type="number" step=".1" v-model="props.excentricity">
+            <input v-else type="number" step=".1" v-model.number="props.brightness">
         </div>
         <select-img-component v-model="props.oclass" :options="opts"></select-img-component>
     </div>
@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Ref, Component, Prop, Emit, PropSync } from 'vue-property-decorator'
+import { Component, PropSync } from 'vue-property-decorator'
 import { Appearance } from '../map/objects.model';
 import { StarsImg } from './astrometrics.utils'
 
