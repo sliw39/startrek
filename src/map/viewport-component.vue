@@ -2,8 +2,11 @@
 <div class="viewport"
   ref="viewport" 
   @mousedown="initDrag"
+  v-touch:start="initDrag"
   @mouseup="stopDrag"
+  v-touch:end="stopDrag"
   @mouseleave="stopDrag"
+  v-touch:moving="onMouseMove"
   @mousemove="onMouseMove" 
   @mousewheel.prevent="onZoomChange">
   <star-component
