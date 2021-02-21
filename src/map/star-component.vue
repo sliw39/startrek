@@ -3,6 +3,7 @@
     class="star" 
     ref="star"
     @click="$emit('clicked')" 
+    @dblclick="$emit('dblclicked')"
     :class="classes"
     :style="{left: x+'px', top: y+'px'}">&nbsp;<span class="name">{{system.names[0]}}</span>&nbsp;<span class="subname" v-if="system.names[1]">({{system.names[1]}})</span></div>
 </template>

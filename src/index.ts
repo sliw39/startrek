@@ -21,7 +21,7 @@ Vue.use(VueRouter);
 
 const routes = [
     { name: "Carte", path: "/map", component: MapComponent }, 
-    { name: "Astrometrie", path: "/astrometrics", component: AstrometricsComponent }, 
+    { name: "Astrometrie", path: "/astrometrics/:uid", component: AstrometricsComponent }, 
     { name: "Messages", path: "/messages", component: MessagesComponent }]
 
 const router = new VueRouter({

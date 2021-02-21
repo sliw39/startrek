@@ -28,14 +28,11 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import { Route } from "vue-router";
-import AstrometricsComponent from "../astrometrics/astrometrics.form.vue";
-import MapComponent from "../map/map-component.vue";
-import MainMsgComponent from "../messages/main-msg-component.vue";
 
 @Component({
-    components: { MapComponent, MainMsgComponent, AstrometricsComponent }
+    components: { }
 })
 export default class MainframeComponent extends Vue {
     category = ''

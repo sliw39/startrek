@@ -16,7 +16,8 @@
       :y="s.y"
       :system="s.s"
       :selected="s.s === selectedElement"
-      @clicked="select(s.s)">
+      @clicked="select(s.s)"
+      @dblclicked="goto(s.s)">
   </star-component>
   <div class="indicator" v-if="selectedElement && distance && labelPos" :style="{top: labelPos.y+'px', left: labelPos.x+'px'}">
     <div>distance : {{distance.al.toFixed(1)}} al</div>
@@ -38,6 +39,7 @@ import { IPoint, Point, Rectangle, Segment, Vector } from "../framework/geometry
 import map from "./map.module";
 import _ from "lodash";
 import {SystemIo} from "../astrometrics/astrometrics.service"
+import AstrometricsComponent from "../astrometrics/astrometrics.form.vue";
 
 const AL_PX = 10;
 
@@ -173,6 +175,15 @@ export default class ViewportComponent extends Vue {
     } else {
       map.zoomOut();
     }
+  }
+
+  goto(system: System) {
+    this.$router.push({
+      name: "Astrometrie",
+      params: {
+        uid: system._uid
+      }
+    })
   }
 }
 </script>

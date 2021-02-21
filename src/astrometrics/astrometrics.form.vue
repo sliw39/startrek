@@ -75,6 +75,12 @@ export default class AstrometricsComponent extends Vue {
   selectedSystemData: System | null = null;
   selectedData: CelestialObject | null = null;
 
+  mounted() {
+    if(this.$route.params.uid) {
+      this.selectSystem(this.$route.params.uid);
+    }
+  }
+
   async selectItem(system: CollapsibleElement) {
     if (system.type !== "System") {
       let s = await CelestialIo.get(system.id);
