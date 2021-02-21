@@ -11,7 +11,7 @@
         <div class="down" @click="move('down')">o</div>
     </div>
 
-    <search-form @value="findCelestrial"></search-form>
+    <search-form @value="findCelestial"></search-form>
 </div>
 </template>
 
@@ -95,7 +95,7 @@ export default class ToolbarComponent extends Vue {
     map.move({dir, amount: 15});
   }
 
-  async findCelestrial(uid: string) {
+  async findCelestial(uid: string) {
     let sys = await SystemIo.get(uid);
     if(sys) {
       map.selectSystem(sys);

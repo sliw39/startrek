@@ -455,7 +455,7 @@ export class System {
             if(typeof obj === "string") {
                 continue;
             }
-            objs.push(obj instanceof CelestialObject ? obj : parseCelestrial(obj));
+            objs.push(obj instanceof CelestialObject ? obj : parseCelestial(obj));
         }
         let system = new System(data.names || [], data.coordinate, objs);
         system._uid = data._uid;
@@ -527,7 +527,7 @@ export class Asteroid extends CelestialObject {
     constructor(names: string[], orbital: OrbitalProperties|undefined, public physical: PhysicalProperties, appearance: Appearance) {  super(names, orbital, physical, appearance); }
 }
 
-export function parseCelestrial(data: any) {
+export function parseCelestial(data: any) {
     let c: CelestialObject;
     switch(data._type) {
         case "Star":

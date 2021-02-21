@@ -33,11 +33,11 @@ import Vue from 'vue'
 import { Component, PropSync } from 'vue-property-decorator';
 import { Star, System } from '../map/objects.model';
 import FormCoordinates from "./coordinates.form.vue";
-import FormCelestrial from "./celestrial.form.vue";
+import FormCelestial from "./celestial.form.vue";
 import _ from "lodash";
 
 @Component({
-    components: { FormCoordinates, FormCelestrial }
+    components: { FormCoordinates, FormCelestial }
 })
 export default class FormSystem extends Vue {
     @PropSync("value", {type: System, default: () => System.defaultSystem()}) system!: System

@@ -1,5 +1,5 @@
 <template>
-  <div class="celestrial-form">
+  <div class="celestial-form">
     <div class="row main-name">
       <span>Nom standard</span>
       <input type="text" v-model.trim="obj.names[0]" />
@@ -32,7 +32,7 @@
 </template>
 
 <style lang="less">
-.celestrial-form {
+.celestial-form {
   display: flex;
   flex-direction: column;
   .names {
@@ -74,7 +74,7 @@ import FormPhysicalProperties from "./physical-properties.form.vue";
 @Component({
   components: { FormOrbitalProperties, FormAppearance, FormPhysicalProperties },
 })
-export default class FormCelestrial extends Vue {
+export default class FormCelestial extends Vue {
   @PropSync("value", CelestialObject) obj!: CelestialObject;
 }
 </script>

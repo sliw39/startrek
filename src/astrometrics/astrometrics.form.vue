@@ -11,12 +11,12 @@
       ></collapsible-component>
     </div>
     <div class="forms-container" v-if="selectedSystem">
-      <celestrial-form
+      <celestial-form
         v-if="selectedData"
         v-model="selectedData"
         @save="save"
         @remove="remove"
-      ></celestrial-form>
+      ></celestial-form>
       <system-form v-else v-model="selectedSystemData"
         @save="saveSystem"
         @remove="removeSystem"
@@ -57,18 +57,18 @@ import {
   Appearance,
   CelestialObject,
   OrbitalProperties,
-  parseCelestrial,
+  parseCelestial,
   PhysicalProperties,
   System,
 } from "../map/objects.model";
-import { CelestrialIo, SystemIo } from "./astrometrics.service";
+import { CelestialIo, SystemIo } from "./astrometrics.service";
 import { StarsImg } from "./astrometrics.utils";
 import SearchForm from "./search.form.vue";
-import CelestrialForm from "./celestrial.form.vue";
+import CelestialForm from "./celestial.form.vue";
 import SystemForm from "./system.form.vue";
 
 @Component({
-  components: { SearchForm, CelestrialForm, SystemForm },
+  components: { SearchForm, CelestialForm, SystemForm },
 })
 export default class AstrometricsComponent extends Vue {
   selectedSystem: CollapsibleElement | null = null;
@@ -77,7 +77,7 @@ export default class AstrometricsComponent extends Vue {
 
   async selectItem(system: CollapsibleElement) {
     if (system.type !== "System") {
-      let s = await CelestrialIo.get(system.id);
+      let s = await CelestialIo.get(system.id);
       if (s) {
         this.selectedData = s;
       }
@@ -88,8 +88,13 @@ export default class AstrometricsComponent extends Vue {
     let sys: System | undefined;
     if (uid === "NEW") {
       sys = System.defaultSystem();
-    } else {
+    } else if(await SystemIo.exists(uid)) {
       sys = await SystemIo.get(uid);
+    } else {
+      let cel = await CelestialIo.get(uid);
+      if(cel) {
+        sys = await CelestialIo.getSystem(cel);
+      }
     }
     if (!sys) {
       return;
@@ -107,7 +112,7 @@ export default class AstrometricsComponent extends Vue {
   }
 
   addSatelite(data: { parent: CollapsibleElement; type: string }) {
-    this.selectedData = parseCelestrial({
+    this.selectedData = parseCelestial({
       _type: data.type,
       names: [""],
       orbital: OrbitalProperties.origin().serialize(),
@@ -129,7 +134,7 @@ export default class AstrometricsComponent extends Vue {
         type: obj.constructor.name,
         img: StarsImg.find((d) => d.key === obj.appearance.oclass)?.url,
       } as CollapsibleElement;
-      let children = await CelestrialIo.getChildren(obj._uid);
+      let children = await CelestialIo.getChildren(obj._uid);
       if (children && children.length) {
         sat.satelites = await this.celestialTree(children);
       }
@@ -148,7 +153,7 @@ export default class AstrometricsComponent extends Vue {
         system.objects.push(this.selectedData);
         await SystemIo.upsert(system);
       } else {
-        await CelestrialIo.upsert(this.selectedData);
+        await CelestialIo.upsert(this.selectedData);
       }
       await this.selectSystem(this.selectedSystem.id);
     }
@@ -156,7 +161,7 @@ export default class AstrometricsComponent extends Vue {
 
   async remove() {
     if (this.selectedData && this.selectedSystem) {
-      await CelestrialIo.remove(this.selectedData._uid);
+      await CelestialIo.remove(this.selectedData._uid);
       let system = await SystemIo.get(this.selectedData._parent);
       if (system) {
         let idx = system.objects.findIndex(

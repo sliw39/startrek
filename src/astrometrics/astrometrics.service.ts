@@ -1,4 +1,4 @@
-import { CelestialObject, parseCelestrial, System } from "../map/objects.model";
+import { CelestialObject, parseCelestial, System } from "../map/objects.model";
 import { db } from "../db";
 
 function mapUid(doc: firebase.firestore.DocumentSnapshot): firebase.firestore.DocumentData | undefined {
@@ -15,7 +15,7 @@ export namespace SystemIo {
     let data = system.serialize() as any;
     let promises: Promise<any>[] = [];
     for (let obj of objects) {
-      promises.push(CelestrialIo.upsert(obj));
+      promises.push(CelestialIo.upsert(obj));
     }
     await Promise.all(promises);
     data.objects = objects.map(o => o._uid);
@@ -57,6 +57,11 @@ export namespace SystemIo {
     return (await readSnapshots(systems, deep, query)).filter(e => e !== undefined) as System[];
   }
 
+  export async function findByDirectChild(childUid: string) {
+    let systems = await db.collection("system").where("objects", "array-contains", childUid).get();
+    return (await readSnapshots(systems, false)).filter(e => e !== undefined)[0];
+  }
+
   async function readSnapshots(result: firebase.firestore.QuerySnapshot, deep: boolean, query: string|null = null) {
     if (deep) {
       let promises: Promise<System | undefined>[] = []
@@ -82,7 +87,7 @@ export namespace SystemIo {
     if (!data || data && query && !arrayContains(data.names, query)) {
       return undefined;
     }
-    data.objects = await CelestrialIo.list(...data.objects);
+    data.objects = await CelestialIo.list(...data.objects);
     return System.parse(data);
   }
 
@@ -97,16 +102,16 @@ export namespace SystemIo {
 
 }
 
-export namespace CelestrialIo {
+export namespace CelestialIo {
 
-  export async function upsert(celestrial: CelestialObject) {
-    if (celestrial._uid) {
-      await db.collection("celestrial").doc(celestrial._uid).update(celestrial.serialize());
+  export async function upsert(celestial: CelestialObject) {
+    if (celestial._uid) {
+      await db.collection("celestrial").doc(celestial._uid).update(celestial.serialize());
     } else {
-      let data: any = celestrial.serialize();
+      let data: any = celestial.serialize();
       delete data._uid
       let result = await db.collection("celestrial").add(data)
-      celestrial._uid = result.id;
+      celestial._uid = result.id;
     }
   }
 
@@ -114,14 +119,14 @@ export namespace CelestrialIo {
     if (ids.length === 0) { return []; }
     let promises: Promise<CelestialObject | undefined>[] = []
     for (let id of ids) {
-      promises.push(CelestrialIo.get(id));
+      promises.push(CelestialIo.get(id));
     }
     return (await Promise.all(promises)).filter(e => e !== undefined) as CelestialObject[];
   }
 
   export async function get(id: string) {
     let doc = await db.collection("celestrial").doc(id).get();
-    return doc.exists ? parseCelestrial(mapUid(doc)) : undefined;
+    return doc.exists ? parseCelestial(mapUid(doc)) : undefined;
   }
 
   export async function remove(uid: string) {
@@ -129,13 +134,25 @@ export namespace CelestrialIo {
   }
 
   export async function find(query: string) {
-    return (await db.collection("celestrial").where("names", "array-contains", query).get()).docs.map(doc => parseCelestrial(mapUid(doc)));
+    return (await db.collection("celestrial").where("names", "array-contains", query).get()).docs.map(doc => parseCelestial(mapUid(doc)));
   }
 
   export async function getChildren(parentUid: string) {
     if(!parentUid) {
       return []
     }
-    return (await db.collection("celestrial").where("_parent", "==", parentUid).orderBy("orbital.semiMajorAxis").get()).docs.map(doc => parseCelestrial(mapUid(doc)));
+    return (await db.collection("celestrial").where("_parent", "==", parentUid).orderBy("orbital.semiMajorAxis").get()).docs.map(doc => parseCelestial(mapUid(doc)));
+  }
+
+  export async function getSystem(celestial: CelestialObject): Promise<System | undefined> {
+    if(celestial._parent) {
+      if(await SystemIo.exists(celestial._parent)) {
+        return SystemIo.get(celestial._parent);
+      } else {
+        return getSystem(await get(celestial._parent) as CelestialObject);
+      }
+    } else {
+      return SystemIo.findByDirectChild(celestial._uid);
+    }
   }
 }

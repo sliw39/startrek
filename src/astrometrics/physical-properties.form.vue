@@ -24,7 +24,7 @@ import FormPhyQty from "./physical-quantity.form.vue";
 @Component({
     components: { FormPhyQty }
 })
-export default class FormCelestrial extends Vue {
+export default class FormCelestial extends Vue {
     @PropSync("value", PhysicalProperties) props!: PhysicalProperties;
     readonly = false
 }
