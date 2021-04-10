@@ -4,6 +4,7 @@ import MainframeComponent from "./main/mainframe-component.vue";
 import MapComponent from "./map/map-component.vue";
 import AstrometricsComponent from "./astrometrics/astrometrics.form.vue";
 import MessagesComponent from "./messages/main-msg-component.vue";
+import TilesetComponent from "./vessel/tileset-component.vue";
 import Vue2TouchEvents from 'vue2-touch-events'
 import VueRouter from 'vue-router'
 import { store } from "./store.vuex";
@@ -22,7 +23,8 @@ Vue.use(VueRouter);
 const routes = [
     { name: "Carte", path: "/map", component: MapComponent }, 
     { name: "Astrometrie", path: "/astrometrics/:uid", component: AstrometricsComponent }, 
-    { name: "Messages", path: "/messages", component: MessagesComponent }]
+    { name: "Messages", path: "/messages", component: MessagesComponent },
+    { name: "Vaisseaux", path: "/vessels", component: TilesetComponent }]
 
 const router = new VueRouter({
     routes
