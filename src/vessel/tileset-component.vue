@@ -5,10 +5,11 @@
             <tile-component 
                 v-if="itemAt(i, j)"
                 :value="itemAt(i, j)" 
-                :key="j"></tile-component>
+                :key="j"
+                @dblclick.native="$emit('itemdblclick', {x:i, y:j, item: itemAt(i, j)})"></tile-component>
             <div v-else 
                 class="empty-cell"
-                @drop="$emit('dropitem', {y:i, x:j})" 
+                @drop="$emit('dropitem', {x:i, y:j})" 
                 @dragover.prevent
                 @dragenter.prevent></div>
         </div>
@@ -91,7 +92,7 @@ export default class TilesetComponent extends Vue {
     @PropSync("value") grid!: Vessel;
 
     itemAt(i: number, j: number) {
-        return this.grid.get(new Grid(j, i));
+        return this.grid.get(new Grid(i, j));
     }
 
     @Watch("grid", {deep: true})

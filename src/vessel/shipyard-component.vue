@@ -1,6 +1,8 @@
 <template>
 <div class="shipyard">
-    <tileset-component class="buildport" @dropitem="onDrop" v-model="grid"></tileset-component>
+    <tileset-component class="buildport" v-model="grid"
+         @dropitem="onDrop"
+         @itemdblclick="remove"></tileset-component>
     <library-component class="library" @itemdrag="onDrag"></library-component>
 </div>
 </template>
@@ -53,6 +55,10 @@ export default class ShipyardComponent extends Vue {
             this.grid.addCell(this.draggedItem.newInstance(coord));
             this.$forceUpdate();
         }
+    }
+
+    remove({item}: {item: Part}) {
+        this.grid.removeCell(item);
     }
 }
 </script>

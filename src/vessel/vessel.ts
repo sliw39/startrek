@@ -56,6 +56,11 @@ export class Vessel implements HexaGrid {
         return this.grid[coordinates.diag.hash];
     }
 
+    removeCell(cell: Part) {
+        delete this.grid[cell.position.diag.hash];
+        this.cells.splice(this.cells.map(c => c.position.grid.hash).indexOf(cell.position.grid.hash), 1);
+    }
+
     energyBalance(): EnergyBalance {
         const onlineCells = this.cells.filter(part => ["ONLINE", "DAMAGED"].indexOf(part.state) !== -1);
         const energyCells = onlineCells.filter(part => part instanceof EnergyPart) as EnergyPart[];

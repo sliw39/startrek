@@ -16,6 +16,7 @@
   position: relative;
   border-top: 1px solid white;
   border-bottom: 1px solid white;
+  user-select: none;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
   &.energy {
