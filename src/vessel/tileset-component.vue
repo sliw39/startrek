@@ -1,14 +1,16 @@
 <template>
 <div class="tileset">
-    <div class="row" v-for="i in HEIGHT" :key="i" :class="{'odd' : i%2 === 0}">
-        <div class="cell" v-for="j in WIDTH" :key="j">
+    <div class="row" v-for="i in width" :key="i" :class="{'odd' : i%2 === 0}">
+        <div class="cell" v-for="j in height" :key="j">
             <tile-component 
                 v-if="itemAt(i, j)"
                 :value="itemAt(i, j)" 
                 :key="j"
-                @dblclick.native="$emit('itemdblclick', {x:i, y:j, item: itemAt(i, j)})"></tile-component>
+                :title="itemAt(i, j).position.grid.hash"
+                @dblclick.native="$emit('itemdblclick', itemAt(i, j))"></tile-component>
             <div v-else 
                 class="empty-cell"
+                :title="'g' + i + ':' + j"
                 @drop="$emit('dropitem', {x:i, y:j})" 
                 @dragover.prevent
                 @dragenter.prevent></div>
@@ -79,20 +81,25 @@
 <script lang="ts">
 import { Component, PropSync, Vue, Watch } from "vue-property-decorator";
 import { Grid } from "./hexagon";
+import { Vessel } from "./vessel";
 import TileComponent from "./tile-component.vue";
-import { EnergyPart, Vessel } from "./vessel";
 
 @Component({
     components: {TileComponent}
 })
 export default class TilesetComponent extends Vue {
-    WIDTH = 12;
-    HEIGHT = 24;
 
     @PropSync("value") grid!: Vessel;
 
     itemAt(i: number, j: number) {
         return this.grid.get(new Grid(i, j));
+    }
+
+    get height() {
+        return Math.max(this.grid.rect.height + 1, 2);
+    }
+    get width() {
+        return Math.max(this.grid.rect.width + 2, 6);
     }
 
     @Watch("grid", {deep: true})

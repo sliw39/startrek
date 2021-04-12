@@ -7,6 +7,10 @@ export function registerBehavior(behavior: Behavior) {
     BEHAVIORS[behavior.name] = behavior;
 }
 
+export function resolveBehaviors(behaviors: string[] = []) {
+    return behaviors.map(b => BEHAVIORS[b]).filter(b => b !== undefined);
+}
+
 registerBehavior({
     name: 'on-destroy-kill-damage-neightbors',
     install(part: Part) {

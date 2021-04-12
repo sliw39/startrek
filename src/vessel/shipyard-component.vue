@@ -36,13 +36,6 @@ export default class ShipyardComponent extends Vue {
     grid = new Vessel();
     draggedItem!: Part;
 
-    created() {
-        this.grid.addCell(new EnergyPart(new Grid(3,3), "matrice de dilithium", 6));
-        this.grid.addCell(new EnergyPart(new Grid(4,3), "matrice de dilithium 4", 6));
-        this.grid.addCell(new EnergyPart(new Grid(3,4), "matrice de dilithium 2", 6));
-        this.grid.addCell(new EnergyPart(new Grid(5,5), "matrice de dilithium 3", 6));
-    }
-
     onDrag(payload: Part) {
         console.log("ondrag")
         this.draggedItem = payload;
@@ -57,7 +50,7 @@ export default class ShipyardComponent extends Vue {
         }
     }
 
-    remove({item}: {item: Part}) {
+    remove(item: Part) {
         this.grid.removeCell(item);
     }
 }

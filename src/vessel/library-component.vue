@@ -67,34 +67,33 @@
 .lib-tile-wrapper {
     display: flex;
     flex-flow: row wrap;
-    justify-content: center;
-    font-size: .4rem;
+    justify-content: flex-start;
+    font-size: .27rem;
+
+    .hexagon {
+        margin: 1em 4em 1em 4em;
+    }
 }
 </style>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { O } from "./hexagon";
+import { CommandPart, DefensePart, EnergyPart, EngineeringPart, LifePart, Part, SciencePart } from "./vessel";
+import { BEHAVIORS } from "./behaviors";
+import { PartLibrary } from "./vessel-library.service";
 import SectionComponent from "../framework/section-component.vue";
 import TileComponent from "./tile-component.vue";
-import { O } from "./hexagon";
-import { DefensePart, EnergyPart, Part } from "./vessel";
-import { BEHAVIORS } from "./behaviors";
 
 @Component({
     components: { SectionComponent, TileComponent }
 })
 export default class LibraryComponent extends Vue {
-    parts: Part[] = [
-        new EnergyPart(O, "matrice de dilithium", 6, [BEHAVIORS['energy-depleted']]),
-        new EnergyPart(O, "générateur à fusion", 3, [BEHAVIORS['energy-depleted']]),
-        new EnergyPart(O, "batterie auxiliaire", 5),
-        new EnergyPart(O, "circuit EPS", 1, [BEHAVIORS['on-destroy-kill-damage-neightbors']]),
+    parts: Part[] = []
 
-        new DefensePart(O, "canon plasma", 1),
-        new DefensePart(O, "phaseur", 2),
-        new DefensePart(O, "torpilles à photons", 3),
-        new DefensePart(O, "déflecteur", 6),
-    ]
+    async created() {
+        this.parts = (await PartLibrary.loadAll()).map(p => PartLibrary.parsePart(p));
+    }
     
     get energyParts() {
         return this.parts.filter(p => p instanceof EnergyPart);
@@ -105,19 +104,19 @@ export default class LibraryComponent extends Vue {
     }
 
     get lifeParts() {
-        return [];
+        return this.parts.filter(p => p instanceof LifePart);
     }
 
     get commandParts() {
-        return [];
+        return this.parts.filter(p => p instanceof CommandPart);
     }
 
     get engParts() {
-        return [];
+        return this.parts.filter(p => p instanceof EngineeringPart);
     }
 
     get scienceParts() {
-        return [];
+        return this.parts.filter(p => p instanceof SciencePart);
     }
 }
 </script>

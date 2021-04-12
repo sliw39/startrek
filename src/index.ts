@@ -1,5 +1,4 @@
 import Vue from "vue";
-import { firestorePlugin } from "vuefire";
 import MainframeComponent from "./main/mainframe-component.vue"; 
 import MapComponent from "./map/map-component.vue";
 import AstrometricsComponent from "./astrometrics/astrometrics.form.vue";
@@ -7,6 +6,7 @@ import MessagesComponent from "./messages/main-msg-component.vue";
 import ShipyardComponent from "./vessel/shipyard-component.vue";
 import Vue2TouchEvents from 'vue2-touch-events'
 import VueRouter from 'vue-router'
+import { firestorePlugin } from "vuefire";
 import { store } from "./store.vuex";
 
 import "./framework/button-component.vue";

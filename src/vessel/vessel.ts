@@ -1,4 +1,4 @@
-import { HexaCoord } from "./hexagon";
+import { HexaCoord, O } from "./hexagon";
 import _ from "lodash";
 
 export type PartType = "energy" | "defense" | "command" | "science" | "life" | "engineering";
@@ -21,7 +21,7 @@ export interface PartDesc {
     type: PartType;
     value: number;
     behaviors: string[];
-    [kzy: string]: any;
+    [key: string]: any;
 }
 
 export interface Behavior {
@@ -31,11 +31,27 @@ export interface Behavior {
 
 export interface HexaGrid {
     get(position: HexaCoord): Part;
+    rect: {
+        origin: HexaCoord;
+        width: number;
+        height: number;
+    }
 }
 
 export class Vessel implements HexaGrid {
+
     private grid: {[key: string]: Part} = {}
     private cells: Part[] = [];
+
+    get rect() {
+        let result = { origin: O, width: 0, height: 0 }
+        if(this.cells.length !== 0) {
+            let coords = this.cells.map(c => c.position.grid);
+            result.height = Math.max(...coords.map(c => c.y));
+            result.width = Math.max(...coords.map(c => c.x))
+        }
+        return result;
+    }
 
     addCell(cell: Part) {
         if(!this.grid[cell.position.diag.hash]) {
