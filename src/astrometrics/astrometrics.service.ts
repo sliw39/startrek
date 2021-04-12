@@ -1,7 +1,7 @@
 import { CelestialObject, parseCelestial, System } from "../map/objects.model";
 import { db } from "../db";
 
-function mapUid(doc: firebase.firestore.DocumentSnapshot): firebase.firestore.DocumentData | undefined {
+function mapUid(doc: firebase.default.firestore.DocumentSnapshot): firebase.default.firestore.DocumentData | undefined {
   let data: any = doc.data()
   if (data && !data._uid) {
     data._uid = doc.id;
@@ -71,7 +71,7 @@ export namespace SystemIo {
     return (await readSnapshots(systems, false)).filter(e => e !== undefined)[0];
   }
 
-  async function readSnapshots(result: firebase.firestore.QuerySnapshot, deep: boolean, query: string | null = null) {
+  async function readSnapshots(result: firebase.default.firestore.QuerySnapshot, deep: boolean, query: string | null = null) {
     if (deep) {
       let promises: Promise<System | undefined>[] = []
       for (let doc of result.docs) {
@@ -91,7 +91,7 @@ export namespace SystemIo {
     }
   }
 
-  async function parseDocument(doc: firebase.firestore.DocumentSnapshot, query: string | null = null) {
+  async function parseDocument(doc: firebase.default.firestore.DocumentSnapshot, query: string | null = null) {
     let data = mapUid(doc);
     if (!data || data && query && !arrayContains(data.names, query)) {
       return undefined;

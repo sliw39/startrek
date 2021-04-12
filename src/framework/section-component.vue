@@ -14,10 +14,12 @@
         width: 100%;
         margin: 2px;
         border-width: 0;
+        font-size: .85em;
 
         h1 { 
             color: black; 
-            font-size: 22px; 
+            font-size: 1.3em;
+            font-weight: normal;
         }
         .section-title {
             padding-left: 5px;
@@ -26,7 +28,7 @@
         .section-content {
             background-color: black;
             height: 100%;
-            padding: 5px;
+            padding: 5px; 
         }
 
         &.top-title {

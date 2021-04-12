@@ -52,6 +52,8 @@ export class Grid implements HexaCoord {
 
 }
 
+export const O = new Grid(0,0);
+
 export namespace HexaCalc {
     export function neighbors(cell: HexaCoord) {
         const cube = cell.cube;

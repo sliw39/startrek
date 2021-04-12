@@ -1,12 +1,16 @@
 <template>
 <div class="tileset">
-    <div class="row" v-for="i in 6" :key="i" :class="{'odd' : i%2 === 0}">
-        <div class="cell" v-for="j in 6" :key="j">
+    <div class="row" v-for="i in HEIGHT" :key="i" :class="{'odd' : i%2 === 0}">
+        <div class="cell" v-for="j in WIDTH" :key="j">
             <tile-component 
                 v-if="itemAt(i, j)"
-                :part="itemAt(i, j)" 
+                :value="itemAt(i, j)" 
                 :key="j"></tile-component>
-            <div class="empty-cell" v-else></div>
+            <div v-else 
+                class="empty-cell"
+                @drop="$emit('dropitem', {y:i, x:j})" 
+                @dragover.prevent
+                @dragenter.prevent></div>
         </div>
     </div>
 </div>
@@ -72,7 +76,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, PropSync, Vue, Watch } from "vue-property-decorator";
 import { Grid } from "./hexagon";
 import TileComponent from "./tile-component.vue";
 import { EnergyPart, Vessel } from "./vessel";
@@ -81,17 +85,18 @@ import { EnergyPart, Vessel } from "./vessel";
     components: {TileComponent}
 })
 export default class TilesetComponent extends Vue {
-    grid = new Vessel();
+    WIDTH = 12;
+    HEIGHT = 24;
+
+    @PropSync("value") grid!: Vessel;
 
     itemAt(i: number, j: number) {
-        return this.grid.get(new Grid(i, j));
+        return this.grid.get(new Grid(j, i));
     }
 
-    created() {
-        this.grid.addCell(new EnergyPart(new Grid(3,3), "matrice de dilithium", 6));
-        this.grid.addCell(new EnergyPart(new Grid(4,3), "matrice de dilithium 4", 6));
-        this.grid.addCell(new EnergyPart(new Grid(3,4), "matrice de dilithium 2", 6));
-        this.grid.addCell(new EnergyPart(new Grid(5,5), "matrice de dilithium 3", 6));
+    @Watch("grid", {deep: true})
+    updateGrid() {
+        this.$forceUpdate();
     }
 }
 </script>

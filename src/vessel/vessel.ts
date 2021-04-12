@@ -35,8 +35,12 @@ export interface HexaGrid {
 
 export class Vessel implements HexaGrid {
     private grid: {[key: string]: Part} = {}
+    private cells: Part[] = [];
 
     addCell(cell: Part) {
+        if(!this.grid[cell.position.diag.hash]) {
+            this.cells.push(cell);
+        }
         this.grid[cell.position.diag.hash] = cell;
     }
 
@@ -50,10 +54,6 @@ export class Vessel implements HexaGrid {
 
     get(coordinates: HexaCoord) {
         return this.grid[coordinates.diag.hash];
-    }
-
-    get cells() {
-        return _.values(this.grid);
     }
 
     energyBalance(): EnergyBalance {

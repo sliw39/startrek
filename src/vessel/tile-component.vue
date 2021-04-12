@@ -1,5 +1,5 @@
 <template>
-    <div class="hexagon" :class="part.type">
+    <div class="hexagon" :class="part.type" :draggable="draggable" @dragstart="startDrag">
         <div class="content">
             <div class="name">{{part.name}}</div>
             <div class="value">{{part.value}}</div>
@@ -14,6 +14,9 @@
   background-color: white;
   margin: auto;
   position: relative;
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
   &.energy {
       background-color: rgb(137, 198, 255);
@@ -40,9 +43,12 @@
     left: -20%;
     right: -20%;
     font-size: 2em;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
 
     > .name { color: black; }
-    > .value { color: red; }
+    > .value { color: blue; font-weight: bold; }
   }
 
   &::before,
@@ -54,6 +60,8 @@
     width: 100%;
     border-radius: 0;
     transform-origin: center;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
   }
   &::before {
     transform: rotateZ(60deg);
@@ -65,11 +73,21 @@
 </style>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, PropSync, Vue } from "vue-property-decorator";
 import { Part } from "./vessel";
 
 @Component
 export default class TileComponent extends Vue {
-    @Prop() part!: Part;
+    @PropSync("value") part!: Part;
+    @Prop({default: false}) draggable!: boolean;
+
+    startDrag(evt: DragEvent) {
+      if(this.draggable) {
+        console.log("tile drag");
+        this.$emit("ondrag", this.part);
+      } else {
+        evt.preventDefault();
+      }
+    }
 }
 </script>
