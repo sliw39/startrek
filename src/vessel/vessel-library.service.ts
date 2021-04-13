@@ -1,6 +1,6 @@
-import { CommandPart, DefensePart, EnergyPart, EngineeringPart, LifePart, Part, PartDesc, SciencePart } from "./vessel";
+import { CommandPart, DefensePart, EnergyPart, EngineeringPart, LifePart, Part, PartDesc, SciencePart, Vessel, VesselDesc } from "./vessel";
 import { db } from "../db";
-import { HexaCoord, O } from "./hexagon";
+import { HexaCalc, HexaCoord, O } from "./hexagon";
 import { resolveBehaviors } from "./behaviors";
 
 export namespace PartLibrary {
@@ -39,5 +39,66 @@ export namespace PartLibrary {
                 ep.stock = data.stock;
                 return ep;
         }
+    }
+}
+
+export namespace VesselLibrary {
+    interface ClassData extends VesselDesc {
+        cells: {
+            coord: string;
+            name: string;
+        }[]
+    }
+
+    export async function saveClass(vessel: Vessel) { 
+        let data: ClassData = {
+            name: vessel.name,
+            designation: vessel.designation,
+            class: vessel.class,
+            faction: vessel.faction,
+            cells: vessel.cells.map(c => {return {coord: c.position.hash, name: c.name}})
+        }
+        if(vessel._uid) {
+            await db.collection("vesselclass").doc(vessel._uid).update(data);
+        } else {
+            let result = await db.collection("vesselclass").add(data);
+            vessel._uid = result.id;
+        }
+    }
+
+    async function parseClass(id: string, data: ClassData) {
+        let vessel = new Vessel();
+        vessel._uid = id;
+        for(let key in data) {
+            if(key in vessel && ["cells"].indexOf(key) === -1) {
+                vessel[key as keyof VesselDesc] = (data as any)[key];
+            }
+        }
+        for(let cell of (data.cells ?? [])) {
+            vessel.addCell(await PartLibrary.loadAndParsePart(cell.name, HexaCalc.fromHash(cell.coord)));
+        }
+        return vessel;
+    }
+
+    export async function loadClass(desc: VesselDesc) {
+        let query = db.collection("vesselclass");
+        query.where("faction", "==", desc.faction);
+        query.where("designation", "==", desc.designation);
+        query.where("class", "==", desc.class);
+        desc.name && query.where("name", "==", desc.name);
+
+        let docs = (await query.limit(1).get()).docs;
+        return docs.length === 1 ? parseClass(docs[0].id, docs[0].data() as ClassData) : null;
+    }
+
+    export async function listClasses() {
+        return (await db.collection("vesselclass").get()).docs.map(d => { 
+            return {
+                class: d.get("class"),
+                designation: d.get("designation"),
+                faction: d.get("faction"),
+                name: d.get("name")
+            } as VesselDesc
+        });
     }
 }

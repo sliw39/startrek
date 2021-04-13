@@ -38,10 +38,22 @@ export interface HexaGrid {
     }
 }
 
-export class Vessel implements HexaGrid {
+export interface VesselDesc {
+    name?: string;
+    designation: string;
+    class: string;
+    faction: string;
+}
+
+export class Vessel implements HexaGrid, VesselDesc {
+    _uid: string|null = null;
+    name: string = "";
+    designation: string = "";
+    class: string = "";
+    faction: string = "";
 
     private grid: {[key: string]: Part} = {}
-    private cells: Part[] = [];
+    readonly cells: Part[] = [];
 
     get rect() {
         let result = { origin: O, width: 0, height: 0 }

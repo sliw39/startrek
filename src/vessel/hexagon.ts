@@ -77,17 +77,17 @@ export namespace HexaCalc {
     export function fromHash(str: string) : HexaCoord {
         switch(str[0]) {
             case "d": 
-                let d = str.match(/d([0-9]+)$([0-9]+)/);
-                if(d == null || d.length !== 2) throw `Invalid expression ${str}`;
-                return new Diag(parseInt(d[0]), parseInt(d[1]));
+                let d = str.match(/d([0-9]+)\$([0-9]+)/);
+                if(d == null || d.length !== 3) throw `Invalid expression ${str}`;
+                return new Diag(parseInt(d[1]), parseInt(d[2]));
             case "g": 
-                let g = str.match(/g([0-9]+)$([0-9]+)/);
+                let g = str.match(/g([0-9]+)\$([0-9]+)/);
                 if(g == null || g.length !== 3) throw `Invalid expression ${str}`;
-                return new Grid(parseInt(g[0]), parseInt(g[1]));
+                return new Grid(parseInt(g[1]), parseInt(g[2]));
             case "c": 
-                let c = str.match(/c([0-9]+)$([0-9]+)$([0-9]+)/);
-                if(c == null || c.length !== 3) throw `Invalid expression ${str}`;
-                return new Cube(parseInt(c[0]), parseInt(c[1]), parseInt(c[2]));
+                let c = str.match(/c([0-9]+)\$([0-9]+)\$([0-9]+)/);
+                if(c == null || c.length !== 4) throw `Invalid expression ${str}`;
+                return new Cube(parseInt(c[1]), parseInt(c[2]), parseInt(c[3]));
             default:
                 throw `Invalid expression ${str}`
         }

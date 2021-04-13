@@ -21,7 +21,7 @@ export default class ButtonComponent extends Vue {
 
     get style() {
         let classes: {[k:string]: boolean} = parseCorner(this.corners);
-        classes[this.color] = true;
+        classes[this.color || "yellow"] = true;
         return classes;
     }
 

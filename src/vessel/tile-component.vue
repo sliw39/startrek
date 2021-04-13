@@ -32,7 +32,7 @@
       background-color: rgb(255, 154, 242);
   }
   &.science, &.engineering {
-      background-color: rgb(255, 207, 75);
+      background-color: rgb(253, 225, 146);
   }
 
   >.content {
