@@ -2,6 +2,7 @@ import { CommandPart, DefensePart, EnergyPart, EngineeringPart, LifePart, Part, 
 import { db } from "../db";
 import { HexaCalc, HexaCoord, O } from "./hexagon";
 import { resolveBehaviors } from "./behaviors";
+import { ALL } from "node:dns";
 
 export namespace PartLibrary {
     let ALL_PARTS: PartDesc[] = [];
@@ -43,6 +44,9 @@ export namespace PartLibrary {
 }
 
 export namespace VesselLibrary {
+
+    const ALL_CLASSES: Vessel[] = [];
+
     interface ClassData extends VesselDesc {
         cells: {
             coord: string;
@@ -81,6 +85,16 @@ export namespace VesselLibrary {
     }
 
     export async function loadClass(desc: VesselDesc) {
+
+        for(let d of ALL_CLASSES) {
+            if(d.faction == desc.faction &&
+                d.designation == desc.designation &&
+                d.class == desc.class &&
+                (desc.name ? d.name == desc.name : true)) {
+                return d;
+            }
+        }
+
         let query = db.collection("vesselclass");
         query.where("faction", "==", desc.faction);
         query.where("designation", "==", desc.designation);
@@ -88,7 +102,11 @@ export namespace VesselLibrary {
         desc.name && query.where("name", "==", desc.name);
 
         let docs = (await query.limit(1).get()).docs;
-        return docs.length === 1 ? parseClass(docs[0].id, docs[0].data() as ClassData) : null;
+        let vessel = docs.length === 1 ? parseClass(docs[0].id, docs[0].data() as ClassData) : null;
+        if(vessel) {
+            ALL_CLASSES.push(await vessel);
+        }
+        return vessel;
     }
 
     export async function listClasses() {

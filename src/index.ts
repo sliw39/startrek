@@ -3,7 +3,7 @@ import MainframeComponent from "./main/mainframe-component.vue";
 import MapComponent from "./map/map-component.vue";
 import AstrometricsComponent from "./astrometrics/astrometrics.form.vue";
 import MessagesComponent from "./messages/main-msg-component.vue";
-import ShipyardComponent from "./vessel/shipyard-component.vue";
+import VesselLibrary from "./vessel/vessel-library.component.vue";
 import Vue2TouchEvents from 'vue2-touch-events'
 import VueRouter from 'vue-router'
 import { firestorePlugin } from "vuefire";
@@ -24,7 +24,7 @@ const routes = [
     { name: "Carte", path: "/map", component: MapComponent }, 
     { name: "Astrometrie", path: "/astrometrics/:uid", component: AstrometricsComponent }, 
     { name: "Messages", path: "/messages", component: MessagesComponent },
-    { name: "Vaisseaux", path: "/vessels", component: ShipyardComponent }]
+    { name: "Vaisseaux", path: "/vessels", component: VesselLibrary }]
 
 const router = new VueRouter({
     routes

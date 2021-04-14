@@ -4,7 +4,6 @@
          @dropitem="onDrop"
          @itemdblclick="remove"></tileset-component>
     <library-component class="library" @itemdrag="onDrag"></library-component>
-    <button-component @click="save">Enregistrer</button-component>
 </div>
 </template>
 
@@ -24,10 +23,10 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, PropSync, Vue } from "vue-property-decorator";
 import TilesetComponent from "./tileset-component.vue";
 import LibraryComponent from "./library-component.vue";
-import { EnergyPart, Part, Vessel } from "./vessel";
+import { Part, Vessel, VesselDesc } from "./vessel";
 import { Grid } from "./hexagon";
 import { VesselLibrary } from "./vessel-library.service";
 import _ from "lodash";
@@ -36,20 +35,16 @@ import _ from "lodash";
     components: { TilesetComponent, LibraryComponent }
 })
 export default class ShipyardComponent extends Vue {
+
+    @PropSync("value") desc!: VesselDesc; 
     grid: Vessel = new Vessel();
     draggedItem!: Part;
 
-    async created() {
-        const desc = {
-            faction: "Humain",
-            class: "Constitution",
-            designation: "NCC 1701",
-            name: "USS Enterprise"
-        };
-        let v = await VesselLibrary.loadClass(desc);
+    async mounted() {
+        let v = await VesselLibrary.loadClass(this.desc);
         if(!v) {
             v = new Vessel();
-            _.assign(v, desc);
+            _.assign(v, this.desc);
             VesselLibrary.saveClass(v);
         }
         this.grid = v;
