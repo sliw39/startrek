@@ -226,6 +226,31 @@
             position: absolute;
             right: 1cm;
         }
+
+        .alignment {
+            width: 52mm;
+            position: relative;
+            text-align: center;
+            margin-left: 2mm;
+            margin-right: 2mm;
+            box-sizing: content-box;
+        }
+
+        .ruler {
+            display: flex;
+            width: 52mm;
+            height: 4mm;
+            margin-top: 1mm;
+            background: rgb(201,75,75);
+            position: relative;
+            position: absolute;
+            background: linear-gradient(90deg, rgba(201,75,75,.8) 0%, rgba(255,239,48,.8) 48%, rgb(83, 138, 0, .5) 100%);
+        }
+        .dot {
+            border: 1px solid #eee;
+            height: 100%;
+            flex: 1;
+        }
     </style>
 </head>
 
@@ -300,25 +325,40 @@
         <div class="misc">
             <div class="bonuses">
                 <div class="row">
-                    <div class="label">Dés bonus :</div>
-                    <div class="cube2"></div>
-                    <div class="cube2"></div>
-                    <div class="cube2"></div>
-                    <div class="cube2"></div>
-                    <div class="cube2"></div>
+                    <div class="label">Ethique :</div>
+                    <div class="alignment">
+                        <div class="ruler">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
-                    <div class="label">Moral :</div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
-                    <div class="circle"></div>
+                    <div class="label">Morale :</div>
+                    <div class="alignment">
+                        <div class="ruler">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="label">Expérience :</div>

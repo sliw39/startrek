@@ -1,0 +1,34 @@
+[
+    {
+        "name": "bouclier énergétique",
+        "value": 3,
+        "type": "defense",
+        "behaviors": ["absorb-2-neighbors-damage"]
+    },
+    {
+        "name": "rayon tracteur",
+        "value": 4,
+        "type": "engineering"
+    },
+    {
+        "name": "camouflage",
+        "value": 4,
+        "type": "command"
+    },
+    {
+        "name": "moteur à singularité",
+        "value": 5,
+        "type": "energy"
+    },
+    {
+        "name": "passerelle autonome",
+        "value": 5,
+        "type": "command"
+    },
+    {
+        "name": "coque en duranium",
+        "value": 5,
+        "type": "defense",
+        "behaviors": ["ignore-1-damage"]
+    }
+]
