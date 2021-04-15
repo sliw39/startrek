@@ -2,7 +2,7 @@ import { CommandPart, DefensePart, EnergyPart, EngineeringPart, LifePart, Part, 
 import { db } from "../db";
 import { HexaCalc, HexaCoord, O } from "./hexagon";
 import { resolveBehaviors } from "./behaviors";
-import { ALL } from "node:dns";
+
 
 export namespace PartLibrary {
     let ALL_PARTS: PartDesc[] = [];
@@ -70,6 +70,16 @@ export namespace VesselLibrary {
         }
     }
 
+    export async function deleteClass(ship: Vessel) {
+        if(ship._uid) {
+            await db.collection("vesselclass").doc(ship._uid).delete();
+            let idx = ALL_CLASSES.findIndex(v => v._uid === ship._uid);
+            if(idx !== -1) {
+                ALL_CLASSES.splice(idx, 1);
+            }
+        }
+    }
+
     async function parseClass(id: string, data: ClassData) {
         let vessel = new Vessel();
         vessel._uid = id;
@@ -95,11 +105,13 @@ export namespace VesselLibrary {
             }
         }
 
-        let query = db.collection("vesselclass");
-        query.where("faction", "==", desc.faction);
-        query.where("designation", "==", desc.designation);
-        query.where("class", "==", desc.class);
-        desc.name && query.where("name", "==", desc.name);
+        let query = db.collection("vesselclass")
+                        .where("faction", "==", desc.faction)
+                        .where("designation", "==", desc.designation)
+                        .where("class", "==", desc.class);
+        if(desc.name) {
+            query = query.where("name", "==", desc.name);
+        }
 
         let docs = (await query.limit(1).get()).docs;
         let vessel = docs.length === 1 ? parseClass(docs[0].id, docs[0].data() as ClassData) : null;

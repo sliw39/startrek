@@ -25,13 +25,13 @@
   &.defense {
       background-color: rgb(255, 137, 137);
   }
-  &.life {
+  &.life, &.science {
       background-color: rgb(163, 255, 163);
   }
   &.command {
       background-color: rgb(255, 154, 242);
   }
-  &.science, &.engineering {
+  &.engineering {
       background-color: rgb(253, 225, 146);
   }
 

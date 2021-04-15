@@ -11,6 +11,11 @@ export function resolveBehaviors(behaviors: string[] = []) {
     return behaviors.map(b => BEHAVIORS[b]).filter(b => b !== undefined);
 }
 
+function ifRunning(part: Part, consumer: () => void) {
+    if(part.state === "DESTROYED" || part.state === "OFFLINE") return;
+    consumer();
+}
+
 registerBehavior({
     name: 'on-destroy-kill-damage-neightbors',
     install(part: Part) {
@@ -29,16 +34,40 @@ registerBehavior({
     install(part: Part) {
         for(let c of HexaCalc.neighbors(part.position)) {
             part.parent?.get(c).onDamage((n, o, p) => {
-                let value = o-n;
-                if(value > part.currentValue) {
-                    p.repair(value - part.currentValue, false)
-                    part.damage(part.currentValue, false);
-                } else {
-                    p.repair(value, false);
-                    part.damage(value, false);
-                }
+                ifRunning(part, () => {
+                    let value = o-n;
+                    if(value > part.currentValue) {
+                        p.repair(value - part.currentValue, false)
+                        part.damage(part.currentValue, false);
+                    } else {
+                        p.repair(value, false);
+                        part.damage(value, false);
+                    }
+                });
             });
         }
+    }
+});
+
+registerBehavior({
+    name: 'absorb-2-neighbors-damage',
+    install(part: Part) {
+        HexaCalc.propagate(part.position, (cell, circle, distance) => {
+            if(distance > 2) { return "STOP"}
+            part.parent?.get(cell).onDamage((n, o, p) => {
+                ifRunning(part, () => {
+                    let value = o-n;
+                    if(value > part.currentValue) {
+                        p.repair(value - part.currentValue, false)
+                        part.damage(part.currentValue, false);
+                    } else {
+                        p.repair(value, false);
+                        part.damage(value, false);
+                    }
+                });
+            });
+            return "NEXT";
+        });
     }
 });
 
@@ -71,5 +100,19 @@ registerBehavior({
                 }
             });
         }
+    }
+});
+
+registerBehavior({
+    name: 'ignore-1-damage',
+    install(part: Part) {
+        HexaCalc.propagate(part.position, cell => {
+            part.parent?.get(cell).onDamage((n,o,p) => {
+                ifRunning(part, () => {
+                    p.repair(Math.min(1, Math.abs(o-n)), false);
+                });
+            });
+            return "NEXT";
+        });
     }
 });

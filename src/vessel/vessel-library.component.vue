@@ -8,23 +8,68 @@
         <shipyard-component ref="shipyard" v-model="selectedShip"></shipyard-component>
     </div>
     <div class="ship-list" v-else>
-        <table>
-            <tr v-for="vessel in vessels" :key="vessel._uid" @click="selectedShip = vessel">
-                <td><img :src="imageSource(vessel.faction)" :alt="vessel.faction"></td>
-                <td>{{vessel.class}}</td>
-                <td>{{vessel.designation}}</td>
-                <td>{{vessel.name}}</td>
-            </tr>
-        </table>
+        <section-component title="Vaisseaux connus" color="orange" :corners="7" :borders="4">
+            <div class="table">
+                <div class="ship-row" v-for="vessel in vessels" :key="vessel._uid" @click="selectedShip = vessel">
+                    <div class="vessel-faction"><img :src="imageSource(vessel.faction)" :alt="vessel.faction"></div>
+                    <div class="vessel-class">{{vessel.class}}</div>
+                    <div class="vessel-degignation">{{vessel.designation}}</div>
+                    <div class="vessel-name">{{vessel.name}}</div>
+                    <div><button-component @click="deleteShip(vessel)" color="red" :corners="6">Effacer</button-component></div>
+                </div>
+            </div>
+        </section-component>
+        <section-component title="Nouveau vaisseau" color="green" :corners="9" :borders="4">
+            <vessel-add-component @created="createVessel"></vessel-add-component>
+        </section-component>
     </div>    
 </div>
 </template>
 
 <style lang="less">
 .ship-list {
+    display: flex;
+
     img {
         filter: invert(1);
-        height: 2em;
+        height: 3em;
+    }
+
+    .table {
+        display: flex;
+        flex-flow: column nowrap;
+        width: 100%;
+    }
+
+    .ship-row {
+        cursor: pointer;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+
+        > * {
+            padding: 0 1em;
+        }
+        .vessel-faction {
+            flex:1;
+            font-size: 1.3em;
+        }
+        .vessel-class {
+            flex:1;
+            font-size: 1.3em;
+        }
+        .vessel-degignation {
+            flex:1; 
+            font-size: 1.3em;
+        }
+        >.vessel-name {
+            flex:1;
+            font-size: 1.3em;
+        }
+
+        &:hover {
+            background-color: rgba(255, 255, 255, .1);
+        }
     }
 }
 
@@ -43,12 +88,14 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component, Ref } from "vue-property-decorator";
+import { foldHomonyms, LOGO } from "../diplomacy/factions";
 import ShipyardComponent from "./shipyard-component.vue";
+import VesselAddComponent from "./vessel-add.component.vue";
 import { VesselDesc } from "./vessel";
 import { VesselLibrary } from "./vessel-library.service";
 
 @Component({
-    components: {ShipyardComponent}
+    components: {ShipyardComponent, VesselAddComponent}
 })
 export default class VesselLibraryComponent extends Vue {
     vessels: VesselDesc[] = [];
@@ -61,15 +108,7 @@ export default class VesselLibraryComponent extends Vue {
     }
 
     imageSource(faction: string) {
-        let img = faction.toLowerCase();
-
-        switch(img) {
-            case "humain":
-            case "human":
-                img = "starfleet"; break;
-        }
-
-        return `static/${img}.png`;
+        return LOGO[foldHomonyms(faction.toLowerCase())]
     }
 
     async saveShip() {
@@ -79,6 +118,19 @@ export default class VesselLibraryComponent extends Vue {
 
     gotoList() {
         this.selectedShip = null;
+    }
+
+    createVessel(vessel: VesselDesc) {
+        this.vessels.push(vessel);
+        this.selectedShip = vessel;
+    }
+
+    async deleteShip(vessel: VesselDesc) {
+        let v = await VesselLibrary.loadClass(vessel);
+        if(v) {
+            await VesselLibrary.deleteClass(v);
+            this.vessels = await VesselLibrary.listClasses();
+        }
     }
 }
 

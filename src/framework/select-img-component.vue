@@ -3,6 +3,7 @@
         <div class="select-img-option" 
             v-for="opt in options" 
             :key="opt.key"
+            :title="opt.key"
             :style="getUrl(opt.url)" 
             :class="{'selected': opt.key === value}"
             @click="setValue(opt.key)"></div>
@@ -30,7 +31,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Ref, Component, Prop, Emit } from 'vue-property-decorator'
+import { Component, Prop, Emit } from 'vue-property-decorator'
 
 @Component
 export default class SelectImgComponent extends Vue {

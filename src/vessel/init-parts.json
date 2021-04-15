@@ -1,106 +1,34 @@
 [
     {
-        "name": "matrice de dilithium",
-        "value": 6,
-        "type": "energy",
-        "behaviors": ["energy-depleted"]
-    },
-    {
-        "name": "générateur à fusion",
+        "name": "bouclier énergétique",
         "value": 3,
-        "type": "energy",
-        "behaviors": ["energy-depleted"]
+        "type": "defense",
+        "behaviors": ["absorb-2-neighbors-damage"]
     },
     {
-        "name": "batterie auxiliaire",
-        "value": 5,
-        "type": "energy",
-        "behaviors": ["energy-depleted"]
-    },
-    {
-        "name": "circuit EPS",
-        "value": 1,
-        "type": "energy",
-        "behaviors": ["on-destroy-kill-damage-neightbors"]
-    },
-    {
-        "name": "canon plasma",
-        "value": 1,
-        "type": "defense"
-    },
-    {
-        "name": "phaseur",
-        "value": 2,
-        "type": "defense"
-    },
-    {
-        "name": "torpilles à photons",
-        "value": 3,
-        "type": "defense"
-    },
-    {
-        "name": "déflecteur",
-        "value": 6,
-        "type": "defense"
-    },
-    {
-        "name": "système vie",
-        "value": 1,
-        "type": "life"
-    },
-    {
-        "name": "centre médicale",
-        "value": 1,
-        "type": "life"
-    },
-    {
-        "name": "gravité artificielle",
-        "value": 1,
-        "type": "life"
-    },
-    {
-        "name": "holodeck",
-        "value": 5,
-        "type": "life"
-    },
-    {
-        "name": "capteurs",
-        "value": 1,
-        "type": "science"
-    },
-    {
-        "name": "antennes",
-        "value": 1,
-        "type": "science"
-    },
-    {
-        "name": "coeur d'IA",
-        "value": 2,
-        "type": "command"
-    },
-    {
-        "name": "passerelle",
-        "value": 3,
-        "type": "command"
-    },
-    {
-        "name": "propulseur",
-        "value": 3,
-        "type": "engineering"
-    },
-    {
-        "name": "bobine alcubierre",
-        "value": 3,
-        "type": "engineering"
-    },
-    {
-        "name": "navette",
-        "value": 2,
-        "type": "engineering"
-    },
-    {
-        "name": "transporteur",
+        "name": "rayon tracteur",
         "value": 4,
         "type": "engineering"
+    },
+    {
+        "name": "camouflage",
+        "value": 4,
+        "type": "command"
+    },
+    {
+        "name": "moteur à singularité",
+        "value": 5,
+        "type": "energy"
+    },
+    {
+        "name": "passerelle autonome",
+        "value": 5,
+        "type": "command"
+    },
+    {
+        "name": "coque en duranium",
+        "value": 5,
+        "type": "defense",
+        "behaviors": ["ignore-1-damage"]
     }
 ]
