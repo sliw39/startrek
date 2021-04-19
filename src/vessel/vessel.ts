@@ -45,6 +45,16 @@ export interface VesselDesc {
     faction: string;
 }
 
+export function isRunning(part: Part) {
+    return part.state !== "DESTROYED" && part.state !== "OFFLINE";
+}
+
+export function ifRunning(part: Part, consumer: () => void) {
+    if(isRunning(part)) {
+        consumer();
+    }
+}
+
 export class Vessel implements HexaGrid, VesselDesc {
     _uid: string|null = null;
     name: string = "";
@@ -80,6 +90,13 @@ export class Vessel implements HexaGrid, VesselDesc {
         }
     }
 
+    repairAll() {
+        for(let cell of this.cells) {
+            cell.state = "ONLINE";
+            cell.currentValue = cell.value;
+        }
+    }
+
     get(coordinates: HexaCoord) {
         return this.grid[coordinates.diag.hash];
     }
@@ -101,6 +118,15 @@ export class Vessel implements HexaGrid, VesselDesc {
         }
         eb.balance = eb.produced - eb.consumed;
         return eb;
+    }
+
+    isKo() {
+        let bridge = this.cells.find(c => /.*passerelle.*/.test(c.name));
+        let bridgeOk = bridge && isRunning(bridge);
+
+        let hasAtk = this.cells.filter(c => c instanceof DefensePart && c.purpose !== "DEF").length > 0;
+
+        return !bridgeOk || !hasAtk;
     }
 }
 
@@ -223,6 +249,7 @@ export class EnergyPart extends Part {
 export class DefensePart extends Part {
 
     private fireListeners: FireListener[] = [];
+    purpose: "ATK" | "DEF" | "BOTH" = "DEF"
 
     constructor(position: HexaCoord, name: string, value: number, behaviors: Behavior[] = []) {
         super(position, name, value, behaviors);

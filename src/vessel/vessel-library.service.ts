@@ -27,7 +27,9 @@ export namespace PartLibrary {
             case "command":
                 return new CommandPart(coord, data.name, data.value, resolveBehaviors(data.behaviors));
             case "defense":
-                return new DefensePart(coord, data.name, data.value, resolveBehaviors(data.behaviors));
+                let defp = new DefensePart(coord, data.name, data.value, resolveBehaviors(data.behaviors));
+                defp.purpose = data.purpose ?? "DEF";
+                return defp;
             case "engineering":
                 return new EngineeringPart(coord, data.name, data.value, resolveBehaviors(data.behaviors));
             case "life":

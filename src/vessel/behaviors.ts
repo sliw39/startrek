@@ -1,5 +1,5 @@
 import { HexaCalc } from "./hexagon";
-import { Behavior, DefensePart, EnergyPart, Part, PartState } from "./vessel";
+import { Behavior, DefensePart, EnergyPart, ifRunning, Part, PartState } from "./vessel";
 
 export const BEHAVIORS: {[key: string]: Behavior} = {};
 
@@ -9,11 +9,6 @@ export function registerBehavior(behavior: Behavior) {
 
 export function resolveBehaviors(behaviors: string[] = []) {
     return behaviors.map(b => BEHAVIORS[b]).filter(b => b !== undefined);
-}
-
-function ifRunning(part: Part, consumer: () => void) {
-    if(part.state === "DESTROYED" || part.state === "OFFLINE") return;
-    consumer();
 }
 
 registerBehavior({

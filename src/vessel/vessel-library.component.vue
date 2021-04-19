@@ -2,6 +2,7 @@
 <div>
     <div class="ship-detail" v-if="selectedShip">
         <div class="actions">
+            <div class="current-vessel-title"><img :src="imageSource(selectedShip.faction)" :alt="selectedShip.faction">&nbsp;{{selectedShip.class}}&nbsp;-&nbsp;{{selectedShip.designation}}&nbsp;{{selectedShip.name}}</div>
             <button-component @click="gotoList" color="red" :corners="4">Retour</button-component>
             <button-component @click="saveShip" color="green" :corners="6">Enregistrer</button-component>
         </div>
@@ -77,25 +78,40 @@
     display: flex;
     flex-flow: column nowrap;
 
+    .current-vessel-title {
+        flex: 1;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        font-size: 2em;
+        padding-left: 1em;
+
+        img {
+            filter: invert(1);
+            height: 1.5em;
+        }
+    }
+
     >.actions {
         display: flex;
         flex-flow: row nowrap;
         justify-content: flex-end;
+        margin-bottom: .5rem;
     }
 }
 </style>
 
 <script lang="ts">
 import Vue from "vue";
-import { Component, Ref } from "vue-property-decorator";
-import { foldHomonyms, LOGO } from "../diplomacy/factions";
 import ShipyardComponent from "./shipyard-component.vue";
 import VesselAddComponent from "./vessel-add.component.vue";
+import { Component, Ref } from "vue-property-decorator";
+import { foldHomonyms, LOGO } from "../diplomacy/factions";
 import { VesselDesc } from "./vessel";
 import { VesselLibrary } from "./vessel-library.service";
 
 @Component({
-    components: {ShipyardComponent, VesselAddComponent}
+    components: { ShipyardComponent, VesselAddComponent }
 })
 export default class VesselLibraryComponent extends Vue {
     vessels: VesselDesc[] = [];

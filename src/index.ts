@@ -15,6 +15,8 @@ import "./framework/select-component.vue";
 import "./framework/select-img-component.vue";
 import "./framework/collapsible-component.vue";
 
+import "./battle/battle-engine";
+
 
 Vue.use(Vue2TouchEvents);
 Vue.use(firestorePlugin);
