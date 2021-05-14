@@ -3,15 +3,15 @@
     <div class="row" v-for="i in width" :key="i" :class="{'odd' : i%2 === 0}">
         <div class="cell" v-for="j in height" :key="j">
             <tile-component 
-                v-if="itemAt(i, j)"
-                :value="itemAt(i, j)" 
+                v-if="itemAt((i-i%2)/2, j*2-i%2)"
+                :value="itemAt((i-i%2)/2, j*2-i%2)" 
                 :key="j"
-                :title="itemAt(i, j).position.grid.hash"
-                @dblclick.native="$emit('itemdblclick', itemAt(i, j))"></tile-component>
+                :title="itemAt((i-i%2)/2, j*2-i%2).position.cube.hash"
+                @dblclick.native="$emit('itemdblclick', itemAt((i-i%2)/2, j*2-i%2))"></tile-component>
             <div v-else 
                 class="empty-cell"
-                :title="'g' + i + ':' + j"
-                @drop="$emit('dropitem', {x:i, y:j})" 
+                :title="'g' + (i-i%2)/2 + ':' + j*2-i%2"
+                @drop="$emit('dropitem', {x:(i-i%2)/2, y:j*2-i%2})" 
                 @dragover.prevent
                 @dragenter.prevent></div>
         </div>

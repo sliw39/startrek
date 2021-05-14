@@ -31,7 +31,7 @@ export class Cube implements HexaCoord {
     constructor(public readonly x: number, public readonly y: number, public readonly z: number) {}
     get cube() { return this; }
     get diag() { return new Diag(this.x, this.z); }
-    get grid() { return new Grid(this.z + (this.x + (this.x&1)) / 2, this.x) }
+    get grid() { return new Grid(this.z + (this.x - (this.x%2)) / 2, this.x) }
     get hash() { return `c${this.x}$${this.y}$${this.z}`; }
 }
 
@@ -45,7 +45,7 @@ export class Grid implements HexaCoord {
     get grid() { return this; }
     get diag() { return this.cube.diag; }
     get cube() {
-        var z = this.x - (this.y + (this.y&1)) / 2
+        var z = this.x - (this.y - (this.y%2)) / 2
         return new Cube(this.y, -this.y - z, z)
     }
     get hash() { return `g${this.x}$${this.y}`; }

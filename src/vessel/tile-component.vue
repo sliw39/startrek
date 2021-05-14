@@ -98,7 +98,7 @@
 
 <script lang="ts">
 import { Component, Prop, PropSync, Vue } from "vue-property-decorator";
-import { Part } from "./vessel";
+import { Part, ValueChangeEvent } from "./vessel";
 
 @Component
 export default class TileComponent extends Vue {
@@ -109,8 +109,9 @@ export default class TileComponent extends Vue {
     private modifierStack: number[] = [];
 
     mounted() {
-      this.part.onDamage((n, o) => this.addModifier(n-o));
-      this.part.onRepair((n, o) => this.addModifier(n-o));
+      this.part.event.on<ValueChangeEvent>("afterDamage", (evt) => this.addModifier(-Math.abs(evt.data.value-evt.data.oldValue)));
+      this.part.event.on<ValueChangeEvent>("afterRepair", (evt) => this.addModifier(Math.abs(evt.data.value-evt.data.oldValue)));
+      this.part.event.on<ValueChangeEvent>("afterDefine", (evt) => this.addModifier(evt.data.value-evt.data.oldValue));
     }
 
     startDrag(evt: DragEvent) {

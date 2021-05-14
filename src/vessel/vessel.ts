@@ -1,5 +1,6 @@
 import { HexaCoord, O } from "./hexagon";
 import _ from "lodash";
+import { EventBus, EventBusImpl } from "../framework/event";
 
 export type PartType = "energy" | "defense" | "command" | "science" | "life" | "engineering";
 export type PartState = "ONLINE" | "OFFLINE" | "DAMAGED" | "DESTROYED";
@@ -130,15 +131,24 @@ export class Vessel implements HexaGrid, VesselDesc {
     }
 }
 
+export type PartEvents = "beforeDamage" | "afterDamage" | "beforeRepair" | "afterRepair" | "beforeDefine" | "afterDefine" | "beforeStateChange" | "afterStateChange";
+export interface StateChangeEvent {
+    state: PartState;
+    oldState: PartState;
+    part: Part;
+}
+export interface ValueChangeEvent {
+    value: number;
+    oldValue: number;
+    part: Part;
+}
 export abstract class Part {
     state: PartState = "ONLINE";
     currentValue: number;
     type?: PartType;
 
     protected _parent?: HexaGrid;
-    private stateListeners: StateListener[] = [];
-    private damageListeners: ValueListener[] = [];
-    private repairListeners: ValueListener[] = [];
+    #eventBus = new EventBusImpl<PartEvents>("beforeDamage", "afterDamage", "beforeRepair", "afterRepair", "beforeDefine", "afterDefine", "beforeStateChange", "afterStateChange");
 
     constructor(
         public readonly position: HexaCoord, 
@@ -148,9 +158,8 @@ export abstract class Part {
             this.currentValue = value;
         }
 
-    get parent() {
-        return this._parent;
-    }
+    get parent() { return this._parent; }
+    get event(): EventBus<PartEvents> { return this.#eventBus; }
 
     attachParent(parent: HexaGrid) {
         this._parent = parent;
@@ -158,72 +167,83 @@ export abstract class Part {
 
     abstract newInstance(coord: HexaCoord): Part;
 
-    onStateChanged(callback: StateListener) {
-        this.stateListeners.push(callback);
-    }
-    onDamage(callback: ValueListener) {
-        this.damageListeners.push(callback);
-    }
-    onRepair(callback: ValueListener) {
-        this.repairListeners.push(callback);
-    }
-
     damage(amount: number, propagate = true) {
-        if(amount < 0) {
-            throw "Damage amount must be positive";
-        }
-
-        const oldState = this.state;
-        const oldValue = this.currentValue;
-
-        this.currentValue -= amount;
-        if(this.currentValue == 0) {
-            this.state = "OFFLINE";
-        } else if(this.currentValue < 0) {
-            this.state = "DESTROYED";
-            this.currentValue = 0;
-        } else if(amount > 0) {
-            this.state = "DAMAGED";
-        }
-
-        if(propagate && oldState !== this.state) {
-            for(const cb of this.stateListeners) {
-                cb(this.state, oldState, this);
+        this.modify(amount, "Damage", () => {
+            let state = this.state;
+            let value = this.currentValue;
+            
+            value -= amount;
+            if(value === 0) {
+                state = "OFFLINE";
+            } else if(value < 0) {
+                state = "DESTROYED";
+                value = 0;
+            } else if(amount > 0) {
+                state = "DAMAGED";
+            } else {
+                return null;
             }
-        }
-        if(propagate && oldValue !== this.currentValue) {
-            for(const cb of this.damageListeners) {
-                cb(this.currentValue, oldValue, this);
-            }
-        }
-
+            return {value, state};
+        });
     }
 
-    repair(amount: number, propagate = true) {
-        if(amount < 0) {
-            throw "Repair amount must be positive";
-        }
+    repair(amount: number) {
+        this.modify(amount, "Repair", () => {
+            let state = this.state;
+            let value = this.currentValue;
+            
+            value += amount;
+            if(this.currentValue >= this.value) {
+                value = this.value;
+                state = "ONLINE";
+            } else if (value > 0) {
+                state = "DAMAGED";
+            } else {
+                return null; 
+            }
+            return {value, state};
+        });
+    }
 
-        const oldState = this.state;
+    define(amount: number) {
+        this.modify(amount, "Define", () => {
+            let state = this.state;
+            let value = this.currentValue;
+            
+            if(amount <= 0) {
+                state = "DESTROYED";
+                value = 0;
+            } else if(amount >= this.value) {
+                state = this.state === "OFFLINE" ? "OFFLINE" : "ONLINE";
+                value = this.value;
+            } else {
+                state = this.state === "OFFLINE" ? "OFFLINE" : "DAMAGED";
+                value = amount;
+            }
+            return {value, state};
+        });
+    }
+
+    private modify(amount: number, eventName: "Repair" | "Damage" | "Define", modifierFn: () => {value: number, state: PartState} | null) {
+        if(amount < 0) { throw "Amount amount must be positive"; }
+
+        const oldState = this.state;        
         const oldValue = this.currentValue;
+        const res = modifierFn();
+        if(!res) { return; }
 
-        this.currentValue += amount;
-        if(this.currentValue >= this.value) {
-            this.currentValue = this.value;
-            this.state = "ONLINE";
-        } else if (this.currentValue > 0) {
-            this.state = "DAMAGED";
+        const {state, value} = res;
+        let stateEvent = this.#eventBus.trigger<StateChangeEvent>("beforeStateChange", {state, oldState, part: this});
+        let valueEvent = this.#eventBus.trigger<ValueChangeEvent>("before" + eventName as any, {value, oldValue, part: this});
+        
+        if(!stateEvent.stopped) {
+            this.state = stateEvent.data?.state ?? this.state;
+            this.#eventBus.forward<StateChangeEvent>(stateEvent, "afterStateChange", {state: this.state, oldState, part: this});
         }
-
-        if(propagate && oldState !== this.state) {
-            for(const cb of this.stateListeners) {
-                cb(this.state, oldState, this);
-            }
-        }
-        if(propagate && oldValue !== this.currentValue) {
-            for(const cb of this.repairListeners) {
-                cb(this.currentValue, oldValue, this);
-            }
+        
+        if(!valueEvent.stopped) {
+            this.currentValue = valueEvent.data?.value ?? this.currentValue;
+            this.#eventBus.forward<ValueChangeEvent>(valueEvent, "after" + eventName as any, {value: this.currentValue, oldValue, part: this});
         }
     }
 }
