@@ -91,7 +91,9 @@ export namespace VesselLibrary {
             }
         }
         for(let cell of (data.cells ?? [])) {
-            vessel.addCell(await PartLibrary.loadAndParsePart(cell.name, HexaCalc.fromHash(cell.coord)));
+            let part = await PartLibrary.loadAndParsePart(cell.name, HexaCalc.fromHash(cell.coord));
+            part.attachParent(vessel);
+            vessel.addCell(part);
         }
         return vessel;
     }

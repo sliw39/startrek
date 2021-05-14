@@ -17,7 +17,7 @@ registerBehavior({
         part.onStateChanged((newState) => {
             if(newState === "DESTROYED") {
                 for(let c of HexaCalc.neighbors(part.position)) {
-                    part.parent?.get(c).damage(1);
+                    part.parent?.get(c)?.damage(1);
                 }
             } 
         })
@@ -28,15 +28,15 @@ registerBehavior({
     name: 'absorb-direct-neighbors-damage',
     install(part: Part) {
         for(let c of HexaCalc.neighbors(part.position)) {
-            part.parent?.get(c).onDamage((n, o, p) => {
+            part.parent?.get(c)?.onDamage((n, o, p) => {
                 ifRunning(part, () => {
                     let value = o-n;
                     if(value > part.currentValue) {
-                        p.repair(value - part.currentValue, false)
-                        part.damage(part.currentValue, false);
+                        p.repair(value - part.currentValue, true)
+                        part.damage(part.currentValue, true);
                     } else {
-                        p.repair(value, false);
-                        part.damage(value, false);
+                        p.repair(value, true);
+                        part.damage(value, true);
                     }
                 });
             });
@@ -49,7 +49,7 @@ registerBehavior({
     install(part: Part) {
         HexaCalc.propagate(part.position, (cell, circle, distance) => {
             if(distance > 2) { return "STOP"}
-            part.parent?.get(cell).onDamage((n, o, p) => {
+            part.parent?.get(cell)?.onDamage((n, o, p) => {
                 ifRunning(part, () => {
                     let value = o-n;
                     if(value > part.currentValue) {
@@ -102,7 +102,7 @@ registerBehavior({
     name: 'ignore-1-damage',
     install(part: Part) {
         HexaCalc.propagate(part.position, cell => {
-            part.parent?.get(cell).onDamage((n,o,p) => {
+            part.parent?.get(cell)?.onDamage((n,o,p) => {
                 ifRunning(part, () => {
                     p.repair(Math.min(1, Math.abs(o-n)), false);
                 });

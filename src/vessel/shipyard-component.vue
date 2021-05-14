@@ -48,6 +48,7 @@ export default class ShipyardComponent extends Vue {
             VesselLibrary.saveClass(v);
         }
         this.grid = v;
+        v.installAllBehaviors();
     }
 
     onDrag(payload: Part) {

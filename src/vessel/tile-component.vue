@@ -1,10 +1,13 @@
 <template>
-    <div class="hexagon" :class="part.type" :draggable="draggable" @dragstart="startDrag">
-        <div class="content">
-            <div class="name">{{part.name}}</div>
-            <div class="value">{{part.value}}</div>
-        </div>
+  <div class="hexagon" :class="part.type" :draggable="draggable" @dragstart="startDrag" @click="part.damage(1)">
+    <div class="content">
+      <div class="name">{{part.name}}</div>
+      <div class="value">{{part.value}}</div>
     </div>
+    <transition name="modifier" v-on:after-enter="endModifier">
+      <div v-if="modifier !== null" class="modifier" :class="modifier > 0 ? 'modifier-positive' : 'modifier-negative'">{{modifier}}</div>
+    </transition>
+  </div>
 </template>
 
 <style lang="less">
@@ -18,6 +21,26 @@
   border-bottom: 1px solid white;
   user-select: none;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+  .modifier-enter-active {
+    transform: translateY(-10px);
+    opacity: 1 !important;
+  }
+  .modifier{
+    transition: all .5s ease;
+    font-size: 5em;
+    font-weight: bold;
+    position: absolute;
+    z-index: 500;
+    opacity: 0;
+
+    &.modifier-positive {
+      color: green;  
+    }
+    &.modifier-negative {
+      color: red;
+    }
+  }
 
   &.energy {
       background-color: rgb(137, 198, 255);
@@ -82,12 +105,38 @@ export default class TileComponent extends Vue {
     @PropSync("value") part!: Part;
     @Prop({default: false}) draggable!: boolean;
 
+    private modifier: number|null = null;
+    private modifierStack: number[] = [];
+
+    mounted() {
+      this.part.onDamage((n, o) => this.addModifier(n-o));
+      this.part.onRepair((n, o) => this.addModifier(n-o));
+    }
+
     startDrag(evt: DragEvent) {
       if(this.draggable) {
         console.log("tile drag");
         this.$emit("ondrag", this.part);
       } else {
         evt.preventDefault();
+      }
+    }
+
+    addModifier(modifier: number) {
+      this.modifierStack.push(modifier);
+      if(this.modifier === null) {
+        this.modifier = this.modifierStack.shift() ?? null;
+        this.$forceUpdate();
+      }
+    }
+
+    endModifier() {
+      this.modifier = null;
+      if(this.modifierStack.length) {
+        setTimeout(() => {
+          this.modifier = this.modifierStack.shift() ?? null;
+          this.$forceUpdate();
+        },400);
       }
     }
 }

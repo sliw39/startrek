@@ -263,7 +263,7 @@ Promise.all([
 
 
     let stats = [];
-    for(let i=0; i<1000; i++) {
+    for(let i=0; i<1; i++) {
         stats.push(bm.run());
         bm.teams.forEach(t => t.vessels.forEach(v => v.vessel.repairAll()));
     }

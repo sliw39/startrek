@@ -70,9 +70,8 @@ export namespace HexaCalc {
     export function distance(cell1: HexaCoord, cell2: HexaCoord) {
         const a = cell1.cube;
         const b = cell2.cube;
-        return Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.z - b.z));
+        return (Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z)) / 2;
     }
-
 
     export function fromHash(str: string) : HexaCoord {
         switch(str[0]) {
@@ -95,12 +94,13 @@ export namespace HexaCalc {
 
     export function propagate(center: HexaCoord, consumer: (cell: HexaCoord, circle: HexaCoord[], i: number) => "NEXT" | "UP" | "STOP", mode: "AUTO" | "MANUAL" = "AUTO") {
         let distance = 1;
+        const ccube = center.cube;
         while(true) {
             let circle: HexaCoord[] = [];
             for(let i=-distance; i<=distance; i++) {
                 for(let j=-distance; j<=distance; j++) {
                     for(let k=-distance; k<=distance; k++) {
-                        let c = new Cube(i, j, k);
+                        let c = new Cube(ccube.x + i, ccube.y + j, ccube.z + k);
                         if(HexaCalc.distance(center, c) === distance) {
                             circle.push(c);
                         } 
