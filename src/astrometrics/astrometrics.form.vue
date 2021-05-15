@@ -6,9 +6,9 @@
         v-if="selectedSystem"
         v-model="selectedSystem"
         :edit="true"
-        @addsatelite="addSatelite"
+        @addsatelite="addSatelite" 
         @click="selectItem"
-      ></collapsible-component>
+      ></collapsible-component> 
     </div>
     <div class="forms-container" v-if="selectedSystem">
       <celestial-form

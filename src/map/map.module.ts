@@ -1,11 +1,17 @@
-import { Module, VuexModule, Mutation, Action, getModule } from 'vuex-module-decorators'
-import { Coordinate, System } from './objects.model';
-import { store } from "../store.vuex"
-import { Vector } from '../framework/geometry';
+import {
+  Module,
+  VuexModule,
+  Mutation,
+  Action,
+  getModule,
+} from "vuex-module-decorators";
+import { Coordinate, System } from "./objects.model";
+import { store } from "../store.vuex";
+import { Vector } from "../framework/geometry";
 
 @Module({
   namespaced: true,
-  name: 'map',
+  name: "map",
   store,
   dynamic: true,
 })
@@ -52,18 +58,20 @@ class MapModule extends VuexModule {
   }
   @Action
   zoomOut() {
-    if(this.zoom - 0.25 > 0) {
+    if (this.zoom - 0.25 > 0) {
       this.setZoom(this.zoom - 0.25);
     }
   }
 
   @Action
-  move(payload: {dir: "up"|"down"|"left"|"right", amount: number} | Vector) {
-    if(payload instanceof Vector) {
+  move(
+    payload: { dir: "up" | "down" | "left" | "right"; amount: number } | Vector
+  ) {
+    if (payload instanceof Vector) {
       let point = payload.apply(this.center);
-      this.setCenter({ x: point.x, y: point.y, unit: 'al' });
+      this.setCenter({ x: point.x, y: point.y, unit: "al" });
     } else {
-      switch(payload.dir) {
+      switch (payload.dir) {
         case "up":
           this.setCenter({ ...this.center, y: this.center.y - payload.amount });
           break;
@@ -79,9 +87,6 @@ class MapModule extends VuexModule {
       }
     }
   }
-
-  
-
 }
 
 export default getModule(MapModule);

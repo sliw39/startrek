@@ -5,7 +5,7 @@
         "type": "defense",
         "behaviors": ["absorb-2-neighbors-damage"]
     },
-    {
+    { 
         "name": "rayon tracteur",
         "value": 4,
         "type": "engineering"

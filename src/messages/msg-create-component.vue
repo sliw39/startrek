@@ -1,41 +1,58 @@
 <template>
-<div class="msg-create">
-  <div class="row">
-    <label for="from">De : </label> 
-    <input name="from" v-model="from">
-  </div>
-  <div class="row">
-    <label for="to">A : </label> 
-    <input name="to" v-model="to" @focus="toFocus = true">
-  </div>
-  <div v-if="toFocus" class="recipients">
-      <button class="item blue" @click="addRecipient(r)" v-for="r in recipients" v-bind:key="r">{{r}}</button>
-  </div>
+  <div class="msg-create">
+    <div class="row">
+      <label for="from">De : </label>
+      <input name="from" v-model="from" />
+    </div>
+    <div class="row">
+      <label for="to">A : </label>
+      <input name="to" v-model="to" @focus="toFocus = true" />
+    </div>
+    <div v-if="toFocus" class="recipients">
+      <button
+        class="item blue"
+        @click="addRecipient(r)"
+        v-for="r in recipients"
+        v-bind:key="r"
+      >
+        {{ r }}
+      </button>
+    </div>
 
-  <div class="row">
-    <label>Importance : </label> 
-    <select v-model="level">
-      <option value="1">Haute</option>
-      <option value="2">Moyenne</option>
-      <option value="3">Basse</option>
-    </select>
-  </div>
-  <br>
+    <div class="row">
+      <label>Importance : </label>
+      <select v-model="level">
+        <option value="1">Haute</option>
+        <option value="2">Moyenne</option>
+        <option value="3">Basse</option>
+      </select>
+    </div>
+    <br />
 
-  <textarea name="content" v-model="content"></textarea>
+    <textarea name="content" v-model="content"></textarea>
 
-  <div class="checkbox">
-   <input type="checkbox" name="sendNow" v-model="sendNow">envoie immédiat
+    <div class="checkbox">
+      <input type="checkbox" name="sendNow" v-model="sendNow" />envoie immédiat
+    </div>
+    <div class="row" style="flex-direction: row-reverse">
+      <button
+        class="item black-color green corn-br corn-tr"
+        @click="validate()"
+      >
+        Envoyer
+      </button>
+      <button
+        class="item black-color blue corn-bl corn-tl"
+        @click="$emit('exit')"
+      >
+        Retour
+      </button>
+    </div>
   </div>
-  <div class="row" style="flex-direction: row-reverse;">
-    <button class="item black-color green corn-br corn-tr" @click="validate()">Envoyer</button>
-    <button class="item black-color blue corn-bl corn-tl" @click="$emit('exit')">Retour</button>
-  </div>
-</div>
 </template>
 
 <script lang="ts">
-import {Component, Vue, Prop} from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
 import { db } from "../db";
 
 @Component
@@ -43,18 +60,20 @@ export default class MsgCreateComponent extends Vue {
   from = "";
   to = "";
   content = "";
-  level=1;
+  level = 1;
   sendNow = true;
   recipients: string[] = [];
 
   toFocus = false;
 
   mounted() {
-    db.collection("users").get().then(snap => {
-      for(let doc of snap.docs) {
-        this.recipients.push(doc.data().login);
-      }
-    })
+    db.collection("users")
+      .get()
+      .then((snap) => {
+        for (let doc of snap.docs) {
+          this.recipients.push(doc.data().login);
+        }
+      });
   }
 
   addRecipient(r: string) {
@@ -63,19 +82,20 @@ export default class MsgCreateComponent extends Vue {
   }
 
   validate() {
-    db.collection("messages").add({
-      from: this.from,
-      to: this.to.split(","),
-      level: this.level,
-      content: this.content,
-      status: this.sendNow ? "SENT" : "WAIT"
-    }).then(() => this.$emit('exit'))
+    db.collection("messages")
+      .add({
+        from: this.from,
+        to: this.to.split(","),
+        level: this.level,
+        content: this.content,
+        status: this.sendNow ? "SENT" : "WAIT",
+      })
+      .then(() => this.$emit("exit"));
   }
 }
 </script>
 
 <style lang="less">
-
 .msg-create {
   textarea {
     width: 100%;
@@ -87,13 +107,14 @@ export default class MsgCreateComponent extends Vue {
       flex: 1;
       align-self: center;
     }
-    input, select {
+    input,
+    select {
       flex: 5;
     }
   }
 
   .checkbox {
-        display: flex;
+    display: flex;
     align-items: center;
   }
 
@@ -107,13 +128,12 @@ export default class MsgCreateComponent extends Vue {
 
     button {
       min-width: 0 !important;
-          flex: 1;
+      flex: 1;
     }
 
     > button:last-of-type {
       border-bottom-right-radius: 28px;
     }
   }
-
 }
 </style>

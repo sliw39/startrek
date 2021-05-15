@@ -1,15 +1,17 @@
 <template>
-<div class="viewport"
-  ref="viewport" 
-  @mousedown="initDrag"
-  v-touch:start="initDrag"
-  @mouseup="stopDrag"
-  v-touch:end="stopDrag"
-  @mouseleave="stopDrag"
-  v-touch:moving="onMouseMove"
-  @mousemove="onMouseMove" 
-  @mousewheel.prevent="onZoomChange">
-  <star-component
+  <div
+    class="viewport"
+    ref="viewport"
+    @mousedown="initDrag"
+    v-touch:start="initDrag"
+    @mouseup="stopDrag"
+    v-touch:end="stopDrag"
+    @mouseleave="stopDrag"
+    v-touch:moving="onMouseMove"
+    @mousemove="onMouseMove"
+    @mousewheel.prevent="onZoomChange"
+  >
+    <star-component
       v-for="s in systems"
       :key="s.s.names[0]"
       :x="s.x"
@@ -17,43 +19,74 @@
       :system="s.s"
       :selected="s.s === selectedElement"
       @clicked="select(s.s)"
-      @dblclicked="goto(s.s)">
-  </star-component>
-  <div class="indicator" v-if="selectedElement && distance && labelPos" :style="{top: labelPos.y+'px', left: labelPos.x+'px'}">
-    <div>distance : {{distance.al.toFixed(1)}} al</div>
-    <div v-for="i in [1,2,3,4,5,6,7,8,9]" :key="i">warp {{i}} : {{timeStr(distance, i)}}</div>
+      @dblclicked="goto(s.s)"
+    >
+    </star-component>
+    <div
+      class="indicator"
+      v-if="selectedElement && distance && labelPos"
+      :style="{ top: labelPos.y + 'px', left: labelPos.x + 'px' }"
+    >
+      <div>distance : {{ distance.al.toFixed(1) }} al</div>
+      <div v-for="i in [1, 2, 3, 4, 5, 6, 7, 8, 9]" :key="i">
+        warp {{ i }} : {{ timeStr(distance, i) }}
+      </div>
+    </div>
+    <template v-for="pos in grid">
+      <div
+        class="hbars"
+        :key="'h' + pos.y"
+        :style="{ top: pos.y + 'px' }"
+      ></div>
+      <div
+        class="vbars"
+        :key="'v' + pos.x"
+        :style="{ left: pos.x + 'px' }"
+      ></div>
+    </template>
   </div>
-  <template v-for="pos in grid">  
-    <div class="hbars" :key="'h'+pos.y" :style="{top: pos.y + 'px'}"></div>
-    <div class="vbars" :key="'v'+pos.x" :style="{left: pos.x + 'px'}"></div>
-  </template>
-</div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Emit, Ref } from "vue-property-decorator";
-import { System, Distance, Coordinate, Star, OrbitalProperties, Mass, Appearance, PhysicalProperties, Temperature, Time } from "./objects.model";
+import {
+  System,
+  Distance,
+  Coordinate,
+  Star,
+  OrbitalProperties,
+  Mass,
+  Appearance,
+  PhysicalProperties,
+  Temperature,
+  Time,
+} from "./objects.model";
 import StarComponent from "./star-component.vue";
-import { timeStr } from "./navigation.service"
-import { IPoint, Point, Rectangle, Segment, Vector } from "../framework/geometry";
+import { timeStr } from "./navigation.service";
+import {
+  IPoint,
+  Point,
+  Rectangle,
+  Segment,
+  Vector,
+} from "../framework/geometry";
 import map from "./map.module";
 import _ from "lodash";
-import {SystemIo} from "../astrometrics/astrometrics.service"
+import { SystemIo } from "../astrometrics/astrometrics.service";
 import AstrometricsComponent from "../astrometrics/astrometrics.form.vue";
 
 const AL_PX = 10;
 
 @Component({
-  components: { StarComponent }
+  components: { StarComponent },
 })
 export default class ViewportComponent extends Vue {
-
   @Ref() viewport!: HTMLElement;
 
   distance: Distance | null = null;
-  labelPos: {x: number, y: number} | null = null;
-  allSystems: System[] = []
-  
+  labelPos: { x: number; y: number } | null = null;
+  allSystems: System[] = [];
+
   async mounted() {
     this.allSystems = await SystemIo.listAll();
   }
@@ -62,19 +95,19 @@ export default class ViewportComponent extends Vue {
     const w = this.viewport?.offsetWidth;
     const h = this.viewport?.offsetHeight;
 
-    return Rectangle.fromCenter(map.center, w, h).scaled(1/this.alLength);
+    return Rectangle.fromCenter(map.center, w, h).scaled(1 / this.alLength);
   }
 
   get systems() {
-    let res = []
-    for(let s of this.allSystems) {
-      if(this.bounds.include(s.coordinate)) {
+    let res = [];
+    for (let s of this.allSystems) {
+      if (this.bounds.include(s.coordinate)) {
         let point = this.coordinatesToViewportLocation(s.coordinate);
         res.push({
           x: point.x,
           y: point.y,
-          s
-        })
+          s,
+        });
       }
     }
     return res;
@@ -82,20 +115,22 @@ export default class ViewportComponent extends Vue {
 
   get grid() {
     const STEP = 15;
-    let count = Math.ceil(Math.max(this.bounds.witdh, this.bounds.height) / STEP)
-    let x = this.bounds.x0 - this.bounds.x0%15;
-    let y = this.bounds.y0 - this.bounds.y0%15;
-    let res = [this.coordinatesToViewportLocation({x,y})];
-    for(let i=0; i<count; i++) {
-      x += STEP; 
+    let count = Math.ceil(
+      Math.max(this.bounds.witdh, this.bounds.height) / STEP
+    );
+    let x = this.bounds.x0 - (this.bounds.x0 % 15);
+    let y = this.bounds.y0 - (this.bounds.y0 % 15);
+    let res = [this.coordinatesToViewportLocation({ x, y })];
+    for (let i = 0; i < count; i++) {
+      x += STEP;
       y += STEP;
-      res.push(this.coordinatesToViewportLocation({x,y}));
+      res.push(this.coordinatesToViewportLocation({ x, y }));
     }
     return res;
   }
 
   get alLength() {
-    return AL_PX*map.zoom;
+    return AL_PX * map.zoom;
   }
 
   get selectedElement() {
@@ -105,7 +140,7 @@ export default class ViewportComponent extends Vue {
   get viewportCenter() {
     const w = this.viewport?.offsetWidth || 900;
     const h = this.viewport?.offsetHeight || 900;
-    return new Point(w/2, h/2);
+    return new Point(w / 2, h / 2);
   }
 
   select(system: System) {
@@ -118,16 +153,16 @@ export default class ViewportComponent extends Vue {
   oldCenterMemo: Coordinate | null = null;
   initDrag($event: MouseEvent) {
     this.dragStartPosition = new Point($event.clientX, $event.clientY);
-    this.oldCenterMemo = {...map.center}
+    this.oldCenterMemo = { ...map.center };
   }
   stopDrag($event: MouseEvent) {
     this.dragStartPosition = null;
   }
   onMouseMove($event: MouseEvent) {
     let pos = new Point($event.clientX, $event.clientY);
-    if(this.dragStartPosition && this.oldCenterMemo) {
+    if (this.dragStartPosition && this.oldCenterMemo) {
       let seg = new Segment(this.dragStartPosition, pos);
-      if(seg.length > 10) {
+      if (seg.length > 10) {
         this.moveMap(seg, this.oldCenterMemo);
       }
     }
@@ -136,12 +171,16 @@ export default class ViewportComponent extends Vue {
   }
   moveMap = _.throttle((seg: Segment, center: Coordinate) => {
     map.deSelectSystem();
-    let newPoint = seg.toVector().scaled(1/this.alLength).reversed().apply(center);
-    map.setCenter({x: newPoint.x, y: newPoint.y, unit: "al"});
+    let newPoint = seg
+      .toVector()
+      .scaled(1 / this.alLength)
+      .reversed()
+      .apply(center);
+    map.setCenter({ x: newPoint.x, y: newPoint.y, unit: "al" });
     return;
   }, 40);
   updateLabel($event: MouseEvent) {
-    if(map.selectedSystem === null || !$event.target) {
+    if (map.selectedSystem === null || !$event.target) {
       return;
     }
 
@@ -149,28 +188,40 @@ export default class ViewportComponent extends Vue {
     var x = $event.clientX - bounds.left;
     var y = $event.clientY - bounds.top;
 
-    let target = this.coordinatesToViewportLocation(map.selectedSystem.coordinate);
-    this.distance = new Distance(new Segment(target, {x,y}).length / this.alLength, "al");
+    let target = this.coordinatesToViewportLocation(
+      map.selectedSystem.coordinate
+    );
+    this.distance = new Distance(
+      new Segment(target, { x, y }).length / this.alLength,
+      "al"
+    );
 
-    this.labelPos = {x: x+15,y}
+    this.labelPos = { x: x + 15, y };
   }
 
   vectorToOrigin() {
     const w = this.viewport?.offsetWidth;
     const h = this.viewport?.offsetHeight;
-    return Vector.pointToOrigin(map.center).add(Vector.originToPoint(this.viewportCenter));
+    return Vector.pointToOrigin(map.center).add(
+      Vector.originToPoint(this.viewportCenter)
+    );
   }
 
   coordinatesToViewportLocation(coordinates: IPoint) {
-    let point = coordinates instanceof Point ? coordinates : Point.fromObject(coordinates);
+    let point =
+      coordinates instanceof Point
+        ? coordinates
+        : Point.fromObject(coordinates);
     point = point.translated(this.vectorToOrigin());
-    point = Vector.betweenPoints(this.viewportCenter, point).scaled(this.alLength).apply(point);
+    point = Vector.betweenPoints(this.viewportCenter, point)
+      .scaled(this.alLength)
+      .apply(point);
 
     return point;
   }
 
   onZoomChange($event: WheelEvent) {
-    if($event.deltaY > 0) {
+    if ($event.deltaY > 0) {
       map.zoomIn();
     } else {
       map.zoomOut();
@@ -181,9 +232,9 @@ export default class ViewportComponent extends Vue {
     this.$router.push({
       name: "Astrometrie",
       params: {
-        uid: system._uid
-      }
-    })
+        uid: system._uid,
+      },
+    });
   }
 }
 </script>

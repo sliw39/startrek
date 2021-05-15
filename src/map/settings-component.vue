@@ -2,17 +2,21 @@
   <div class="settings">
     <button @click="close">X</button>
     <div class="setting" v-for="key in keys" :key="key">
-      <b>{{key}}</b>
-      <input :type="typeof settings[key]" v-model="settings[key]">
+      <b>{{ key }}</b>
+      <input :type="typeof settings[key]" v-model="settings[key]" ></input>
       <button @click="reset(key)">reset</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Vue, Prop, Emit} from "vue-property-decorator";
+import { Component, Vue, Prop, Emit } from "vue-property-decorator";
 import { System } from "./objects.model";
-import { CurrentSettings, DefaultSettings, SettingsKeys } from "./settings.model";
+import {
+  CurrentSettings,
+  DefaultSettings,
+  SettingsKeys,
+} from "./settings.model";
 import _ from "lodash";
 
 @Component
@@ -41,5 +45,4 @@ export default class StarComponent extends Vue {
     align-items: center;
   }
 }
-
 </style>

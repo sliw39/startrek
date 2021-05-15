@@ -8,7 +8,7 @@
       ></select-component>
     </template>
     <template v-else>
-      <input type="number" v-model="selectedValue" @change="setValue"/>
+      <input type="number" v-model="selectedValue" @change="setValue" />
       <select-component
         :options="selectedAllowedOptions"
         :value="selectedUnit"
@@ -62,12 +62,18 @@ export default class FormPhysicalQuantity extends Vue {
 
   @Emit("input")
   setValue() {
-    return this.value.newInstance(parseFloat(this.selectedValue), this.selectedUnit);
+    return this.value.newInstance(
+      parseFloat(this.selectedValue),
+      this.selectedUnit
+    );
   }
 
   @Emit("input")
   setUnit(data: string) {
-    let val = this.value.newInstance(parseFloat(this.selectedValue), this.selectedUnit);
+    let val = this.value.newInstance(
+      parseFloat(this.selectedValue),
+      this.selectedUnit
+    );
     this.selectedUnit = data;
     this.selectedValue = val.get(data) + "";
     return this.value.newInstance(val.get(data), data);
