@@ -6,7 +6,6 @@ import {
   EnergyPart,
   ifRunning,
   Part,
-  PartState,
   StateChangeEvent,
   ValueChangeEvent,
 } from "./vessel";
@@ -83,7 +82,7 @@ registerBehavior({
   name: "dammage-after-fire",
   install(part: Part) {
     if (part instanceof DefensePart) {
-      part.onFire((value) => part.damage(value, false));
+      part.onFire((value) => part.damage(value));
     }
   },
 });
@@ -114,13 +113,17 @@ registerBehavior({
 registerBehavior({
   name: "ignore-1-damage",
   install(part: Part) {
-    // HexaCalc.propagate(part.position, cell => {
-    // part.parent?.get(cell)?.onDamage((n,o,p) => {
-    // ifRunning(part, () => {
-    // p.repair(Math.min(1, Math.abs(o-n)), false);
-    // });
-    // });
-    // return "NEXT";
-    // });
+    HexaCalc.propagate(part.position, (cell) => {
+      part.parent
+        ?.get(cell)
+        ?.event.on<ValueChangeEvent>("beforeDamage", (evt) => {
+          ifRunning(part, () => {
+            if (evt.data.value > 0) {
+              evt.data.value -= 1;
+            }
+          });
+        });
+      return "NEXT";
+    });
   },
 });

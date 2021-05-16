@@ -50,7 +50,6 @@
         z-index: 1;
         &:hover {
           transform: scale(1.3);
-          filter: drop-shadow(0 0 0.75rem rgb(109, 89, 93));
           z-index: 10;
         }
       }

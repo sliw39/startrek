@@ -1,7 +1,7 @@
+import { EventBus, EventBusImpl } from "../framework/event";
 import { DefensePart, isRunning, Part, Vessel } from "../vessel/vessel";
-import { VesselLibrary } from "../vessel/vessel-library.service";
 
-class Team {
+export class Team {
   static idx = 0;
   constructor(public name: string, public vessels: FullVessel[] = []) {
     vessels.forEach((v) => {
@@ -23,12 +23,12 @@ class Team {
   }
 }
 
-interface Roll {
+export interface Roll {
   attribute: number;
   skill: number;
 }
 
-interface Crew {
+export interface Crew {
   pilot: Roll;
   engineer: Roll;
   tactical: Roll;
@@ -46,27 +46,27 @@ interface Attack {
   };
 }
 
-interface Damages {
+export interface Damages {
   attack: Attack;
   value?: number;
   state: "TOUCH" | "MISSED" | "AVOID";
 }
 
-interface FullVessel {
+export interface FullVessel {
   team?: Team;
   vessel: Vessel;
   crew: Crew;
   executor: Executor;
 }
 
-interface Executor {
+export interface Executor {
   phase1_escapeManoeuver(teams: Team[], vessel: FullVessel): Promise<boolean>;
   phase2_planAttacks(teams: Team[], vessel: FullVessel): Promise<Attack[]>;
   phase3_applyDamages(attacks: Damages): Promise<void>;
   phase4_redispatchEnergy(teams: Team[], vessel: FullVessel): Promise<void>;
 }
 
-class DumbAIExecutor implements Executor {
+export class DumbAIExecutor implements Executor {
   phase1_escapeManoeuver(teams: Team[], vessel: FullVessel): Promise<boolean> {
     return Promise.resolve(Math.random() > 0.5);
   }
@@ -147,10 +147,51 @@ export function roll(spec: Roll = { attribute: 2, skill: 10 }): number {
   return Math.max(0, successes);
 }
 
-type BattleManagerEvent = "turn" | "attack";
-class BattleManager {
+function listenEvent<T extends ConsummableEvent>(evt: T) {
+  return {
+    listener: new Promise<T>((resolve) => {
+      evt.consume = function() {
+        resolve(evt);
+      };
+    }),
+    evt,
+  };
+}
+
+interface ConsummableEvent {
+  consume?: () => void;
+}
+export interface TurnEvent extends ConsummableEvent {
+  turn: number;
+  teams: Team[];
+}
+export interface AttackEvent extends ConsummableEvent {
+  damage: Damages;
+}
+export interface EndEvent extends ConsummableEvent {
+  team: {
+    [teamName: string]: {
+      result: "VICTORY" | "DEFEAT";
+      ref: Team;
+      vessels: {
+        result: "VICTORY" | "DEFEAT";
+        ref: Vessel;
+      }[];
+    };
+  };
+}
+export type BattleManagerEvent = "turn" | "attack" | "end";
+export class BattleManager {
   teams: Team[] = [];
-  private listeners: { [event in BattleManagerEvent]?: (() => void)[] } = {};
+  private _eventBus = new EventBusImpl<BattleManagerEvent>(
+    "turn",
+    "attack",
+    "end"
+  );
+
+  get event(): EventBus<BattleManagerEvent> {
+    return this._eventBus;
+  }
 
   createAndAddTeam(name: string, ...vessels: FullVessel[]) {
     return this.addTeam(new Team(name, vessels));
@@ -161,22 +202,26 @@ class BattleManager {
     return this;
   }
 
-  addListener(event: BattleManagerEvent, listener: () => void) {
-    if (!(event in this.listeners)) {
-      this.listeners[event] = [];
-    }
-    this.listeners[event]?.push(listener);
-  }
-
   async run(
     stopCondition: (turn: number) => Promise<boolean> = () =>
       Promise.resolve(this.teams.filter((t) => !t.isKo()).length < 2)
   ) {
+    this.forEachVessel((t, v) => {
+      v.vessel.installAllBehaviors();
+      return Promise.resolve();
+    });
     let turn = 0;
     while (!(await stopCondition(turn))) {
-      this.dispatch("turn");
-      console.info("TURN" + turn++);
+      console.info("TURN " + turn);
+      let { listener, evt } = listenEvent<TurnEvent>({
+        turn,
+        teams: this.teams,
+      });
+      this._eventBus.trigger<TurnEvent>("turn", evt);
+      await listener;
+      turn++;
 
+      console.info("  => escape manoeuvers");
       let manoeuvers = new WeakMap<FullVessel, number>();
       await this.forEachVessel(async (team, v) => {
         if (await v.executor.phase1_escapeManoeuver(this.teams, v)) {
@@ -186,6 +231,7 @@ class BattleManager {
         }
       });
 
+      console.info("  => plan attacks");
       let attacks: Attack[] = [];
       (
         await this.forEachVessel(async (team, v) => {
@@ -211,38 +257,41 @@ class BattleManager {
         }
 
         damages.push(dmg);
-        this.dispatch("attack", dmg);
       }
 
+      console.info("  => apply damages");
       for (let damage of damages) {
-        damage.attack.target.vessel.executor.phase3_applyDamages(damage);
+        let { listener, evt } = listenEvent<AttackEvent>({ damage });
+        this._eventBus.trigger("attack", evt);
+        await damage.attack.target.vessel.executor.phase3_applyDamages(damage);
+        await listener;
       }
 
+      console.info("  => redispatch energy");
       await this.forEachVessel(async (team, v) => {
         v.executor.phase4_redispatchEnergy(this.teams, v);
       });
     }
 
-    console.info("===========================");
-    let result: any = {};
+    let { listener, evt } = listenEvent<EndEvent>({
+      team: {},
+    });
     for (let team of this.teams) {
-      result[team.name] = team.isKo() ? "DEFEAT" : "VICTORY";
-      console.info(
-        "TEAM " + team.name + " : " + (team.isKo() ? "DEFEAT" : "VICTORY")
-      );
-      for (let vessel of team.vessels.map((v) => v.vessel)) {
-        console.info(
-          "   " + vessel.name + " : " + (vessel.isKo() ? "DEFEATED" : "OK")
-        );
-      }
+      evt.team[team.name] = {
+        ref: team,
+        result: team.isKo() ? "DEFEAT" : "VICTORY",
+        vessels: team.vessels.map((v) => {
+          return {
+            result: v.vessel.isKo() ? "DEFEAT" : "VICTORY",
+            ref: v.vessel,
+          };
+        }),
+      };
     }
-    return result;
-  }
 
-  private dispatch(event: BattleManagerEvent, data?: any) {
-    for (let listener of this.listeners[event] ?? []) {
-      listener();
-    }
+    this._eventBus.trigger("end", evt);
+    await listener;
+    return evt;
   }
 
   private async forEachVessel<T>(
@@ -257,65 +306,3 @@ class BattleManager {
     return Promise.all(promises);
   }
 }
-
-/** TEST CASES */
-
-let bm = new BattleManager();
-Promise.all([
-  VesselLibrary.loadClass({
-    class: "NX",
-    faction: "humains",
-    designation: "NX-01",
-  }),
-  VesselLibrary.loadClass({
-    class: "Oiseau de guerre",
-    faction: "romuliens",
-    designation: "BW5",
-  }),
-]).then(([nx1, bw1]) => {
-  if (!(nx1 && bw1)) return;
-
-  nx1.installAllBehaviors();
-  bw1.installAllBehaviors();
-
-  bm.createAndAddTeam("Federation", {
-    executor: new DumbAIExecutor(),
-    vessel: nx1,
-    crew: {
-      pilot: { skill: 13, attribute: 2 },
-      tactical: { skill: 8, attribute: 4 },
-      engineer: { skill: 10, attribute: 2 },
-    },
-  });
-  bm.createAndAddTeam("Romulans", {
-    executor: new DumbAIExecutor(),
-    vessel: bw1,
-    crew: {
-      pilot: { skill: 7, attribute: 3 },
-      tactical: { skill: 15, attribute: 2 },
-      engineer: { skill: 10, attribute: 2 },
-    },
-  });
-
-  let stats = [];
-  for (let i = 0; i < 1; i++) {
-    stats.push(bm.run());
-    bm.teams.forEach((t) => t.vessels.forEach((v) => v.vessel.repairAll()));
-  }
-  Promise.all(stats).then((res) => {
-    let data: any = {};
-    for (let r of res) {
-      for (let team in r) {
-        if (!(team in data)) {
-          data[team] = {
-            VICTORY: 0,
-            DEFEAT: 0,
-          };
-        }
-        data[team][r[team]]++;
-      }
-    }
-
-    console.info(data);
-  });
-});

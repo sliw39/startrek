@@ -217,7 +217,7 @@ export abstract class Part {
 
   abstract newInstance(coord: HexaCoord): Part;
 
-  damage(amount: number, propagate = true) {
+  damage(amount: number) {
     this.modify(amount, "Damage", () => {
       let state = this.state;
       let value = this.currentValue;

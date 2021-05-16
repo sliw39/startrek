@@ -1,10 +1,9 @@
 <template>
   <div
     class="hexagon"
-    :class="part.type"
+    :class="classes"
     :draggable="draggable"
     @dragstart="startDrag"
-    @click="part.damage(1)"
   >
     <div class="content">
       <div class="name">{{ part.name }}</div>
@@ -23,10 +22,14 @@
 </template>
 
 <style lang="less">
+:root {
+  --gscale: 0;
+}
 .hexagon {
   height: 12em;
   width: 6.9em;
   background-color: white;
+  filter: drop-shadow(2px 4px 4px #222) grayscale(var(--gscale));
   margin: auto;
   position: relative;
   border-top: 1px solid white;
@@ -111,12 +114,16 @@
   &::after {
     transform: rotateZ(-60deg);
   }
+
+  &.offline {
+    --gscale: 1;
+  }
 }
 </style>
 
 <script lang="ts">
 import { Component, Prop, PropSync, Vue } from "vue-property-decorator";
-import { Part, ValueChangeEvent } from "./vessel";
+import { Part, StateChangeEvent, ValueChangeEvent } from "./vessel";
 
 @Component
 export default class TileComponent extends Vue {
@@ -125,17 +132,48 @@ export default class TileComponent extends Vue {
 
   private modifier: number | null = null;
   private modifierStack: number[] = [];
+  private isOnline = true;
+
+  get classes() {
+    let cls = [];
+    if (this.part.type) {
+      cls.push(this.part.type);
+    }
+    if (!this.isOnline) {
+      cls.push("offline");
+    }
+    return cls;
+  }
 
   mounted() {
-    this.part.event.on<ValueChangeEvent>("afterDamage", (evt) =>
-      this.addModifier(-Math.abs(evt.data.value - evt.data.oldValue))
+    this.part.event.on<ValueChangeEvent>(
+      "afterDamage",
+      (evt) => this.addModifier(-Math.abs(evt.data.value - evt.data.oldValue)),
+      "tile"
     );
-    this.part.event.on<ValueChangeEvent>("afterRepair", (evt) =>
-      this.addModifier(Math.abs(evt.data.value - evt.data.oldValue))
+    this.part.event.on<ValueChangeEvent>(
+      "afterRepair",
+      (evt) => this.addModifier(Math.abs(evt.data.value - evt.data.oldValue)),
+      "tile"
     );
-    this.part.event.on<ValueChangeEvent>("afterDefine", (evt) =>
-      this.addModifier(evt.data.value - evt.data.oldValue)
+    this.part.event.on<ValueChangeEvent>(
+      "afterDefine",
+      (evt) => this.addModifier(evt.data.value - evt.data.oldValue),
+      "tile"
     );
+    this.part.event.on<StateChangeEvent>(
+      "afterStateChange",
+      (evt) => {
+        this.isOnline = ["OFFLINE", "DESTROYED"].indexOf(evt.data.state) === -1;
+      },
+      "tile"
+    );
+
+    this.isOnline = ["OFFLINE", "DESTROYED"].indexOf(this.part.state) === -1;
+  }
+
+  destroyed() {
+    this.part.event.off("tile");
   }
 
   startDrag(evt: DragEvent) {
@@ -149,6 +187,9 @@ export default class TileComponent extends Vue {
 
   addModifier(modifier: number) {
     this.modifierStack.push(modifier);
+  }
+
+  applyModifiers() {
     if (this.modifier === null) {
       this.modifier = this.modifierStack.shift() ?? null;
       this.$forceUpdate();
